@@ -1,0 +1,100 @@
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 4vw; /* Chunking spacing */
+  padding-bottom: 4rem;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: #f0f0f0;
+  overflow: hidden;
+  border-radius: 4px; /* Subtle radius */
+}
+
+.product-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-image-wrapper:hover img {
+  transform: scale(1.05); /* Gentle zoom */
+}
+
+.product-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.02);
+  display: flex;
+  align-items: flex-end; /* Button at bottom */
+  padding: 1.5rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.product-image-wrapper:hover .product-overlay {
+  opacity: 1;
+}
+
+.add-btn {
+  width: 100%;
+  background: #fff;
+  color: #000;
+  padding: 0.8rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transform: translateY(10px);
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.product-image-wrapper:hover .add-btn {
+  transform: translateY(0);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.product-info h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.product-info span {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.category {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+  }
+
+  .product-image-wrapper:hover .product-overlay {
+    opacity: 0; /* No hover on mobile, maybe always show button or different UX */
+  }
+}
