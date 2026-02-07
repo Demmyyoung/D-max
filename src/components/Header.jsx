@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { ShoppingBag, User } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -60,7 +61,7 @@ const Header = () => {
         <div className="logo-placeholder" style={{ width: '120px' }}></div>
 
         <motion.nav className="nav-right" style={{ opacity: navOpacity }}>
-          <button className="create-btn">Create</button>
+          <Link to="/create" className="create-btn">Create</Link>
           <button onClick={toggleCart} className="nav-link"><ShoppingBag size={20} /> ({cartItems.length})</button>
           <a href="#" className="nav-link"><User size={20} /></a>
         </motion.nav>

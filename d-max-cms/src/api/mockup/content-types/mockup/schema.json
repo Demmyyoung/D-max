@@ -1,0 +1,30 @@
+{
+  "kind": "collectionType",
+  "collectionName": "mockups",
+  "info": {
+    "singularName": "mockup",
+    "pluralName": "mockups",
+    "displayName": "Mockup",
+    "description": "Studio garment mockups"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "defaultColor": {
+      "type": "string",
+      "default": "#FFFFFF"
+    }
+  }
+}

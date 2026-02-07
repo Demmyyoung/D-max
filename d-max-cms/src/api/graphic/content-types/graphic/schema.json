@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "graphics",
+  "info": {
+    "singularName": "graphic",
+    "pluralName": "graphics",
+    "displayName": "Graphic",
+    "description": "Studio graphics library"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images"]
+    },
+    "category": {
+      "type": "enumeration",
+      "enum": ["logos", "icons", "badges", "patterns", "custom"],
+      "default": "icons"
+    }
+  }
+}

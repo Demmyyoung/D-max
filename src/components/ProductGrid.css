@@ -98,3 +98,32 @@
     opacity: 0; /* No hover on mobile, maybe always show button or different UX */
   }
 }
+
+/* Size indicator */
+.size {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 0.2rem;
+}
+
+/* Loading Skeleton */
+.product-grid.loading {
+  min-height: 400px;
+}
+
+.loading-skeleton {
+  aspect-ratio: 3 / 4;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
