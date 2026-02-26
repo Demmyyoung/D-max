@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shirt, Type, Image as ImageIcon, ChevronDown, Upload, ChevronLeft } from 'lucide-react';
+import { Shirt, Type, Image as ImageIcon, ChevronDown, Upload, ChevronLeft, Cat } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
+import { useDesignStore, FELINE_PATTERNS } from '../../store/useDesignStore';
 import { fetchMockups, fetchGraphics } from '../../services/strapi';
 import { GARMENTS, GRAPHICS as FALLBACK_GRAPHICS, FONTS, COLORS } from '../../data/studioAssets';
 
 const LeftSidebar = ({ isOpen, onToggle }) => {
   const { addLayer, activeGarment, setActiveGarment } = useStudio();
+  const addBlock = useDesignStore((state) => state.addBlock);
+  const addFelinePattern = useDesignStore((state) => state.addFelinePattern);
   const [expandedSection, setExpandedSection] = useState(null); // Closed by default
   const [mockups, setMockups] = useState(GARMENTS);
   const [graphics, setGraphics] = useState(FALLBACK_GRAPHICS);
@@ -35,12 +38,14 @@ const LeftSidebar = ({ isOpen, onToggle }) => {
   }, []);
 
   const handleAddText = () => {
+    // Add to both legacy context and Zustand store
     addLayer({ 
       type: 'text', 
       content: 'YOUR TEXT', 
       fontSize: 28,
       fontFamily: 'Inter'
     });
+    addBlock('text', '', { text: 'YOUR TEXT', fontSize: 28, fontFamily: 'Inter', width: 150, height: 40 });
   };
   
   const handleAddGraphic = (graphic) => {
@@ -50,6 +55,7 @@ const LeftSidebar = ({ isOpen, onToggle }) => {
       src: graphic.src,
       width: 80
     });
+    addBlock('image', graphic.src, { name: graphic.name, width: 80, height: 80 });
   };
   
   const handleImageUpload = (e) => {
@@ -63,6 +69,7 @@ const LeftSidebar = ({ isOpen, onToggle }) => {
           src: event.target.result,
           width: 100
         });
+        addBlock('image', event.target.result, { name: file.name, width: 100, height: 100 });
       };
       reader.readAsDataURL(file);
     }
@@ -81,7 +88,6 @@ const LeftSidebar = ({ isOpen, onToggle }) => {
           onClick={onToggle}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          whileHover={{ scale: 1.05 }}
         >
           <Shirt size={20} />
         </motion.button>

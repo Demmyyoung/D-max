@@ -2,10 +2,23 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Copy, Layers, ChevronRight } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
+import { useDesignStore } from '../../store/useDesignStore';
 import { COLORS } from '../../data/studioAssets';
 
 const RightSidebar = ({ isOpen, onToggle }) => {
   const { selectedLayer, updateLayer, deleteLayer, layers, selectLayer, addLayer } = useStudio();
+  
+  // Zustand store integration
+  const blocks = useDesignStore((state) => state.blocks);
+  const selectedId = useDesignStore((state) => state.selectedId);
+  const selectBlock = useDesignStore((state) => state.selectBlock);
+  const updateBlock = useDesignStore((state) => state.updateBlock);
+  const deleteBlock = useDesignStore((state) => state.deleteBlock);
+  const duplicateBlock = useDesignStore((state) => state.duplicateBlock);
+  
+  // Use Zustand blocks if available, fallback to legacy layers
+  const displayItems = blocks.length > 0 ? blocks : layers;
+  const selectedItem = blocks.find(b => b.id === selectedId) || selectedLayer;
 
   const handleSliderChange = (property, value) => {
     if (selectedLayer) {
@@ -38,7 +51,6 @@ const RightSidebar = ({ isOpen, onToggle }) => {
           onClick={onToggle}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          whileHover={{ scale: 1.05 }}
         >
           <Layers size={20} />
           {layers.length > 0 && <span className="badge">{layers.length}</span>}

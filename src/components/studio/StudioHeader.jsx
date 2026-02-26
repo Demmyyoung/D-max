@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Download, Share2 } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Download, Share2, Sparkles, Command } from 'lucide-react';
 
 const StudioHeader = () => {
   
@@ -26,33 +26,54 @@ const StudioHeader = () => {
     }
   };
 
+  const openCommandPalette = () => {
+    // Dispatch Ctrl+K event to open command palette
+    const event = new KeyboardEvent('keydown', {
+      key: 'k',
+      ctrlKey: true,
+      bubbles: true
+    });
+    document.dispatchEvent(event);
+  };
+
   return (
     <header className="studio-header">
       <div className="studio-header-left">
         <Link to="/" className="back-link">
-          <ArrowLeft size={20} />
-          <span>Back</span>
+          <ArrowLeft size={18} />
+          <span>Exit</span>
         </Link>
         <div className="project-info">
           <span className="project-name">Untitled Design</span>
-          <span className="project-status">Draft</span>
+          <span className="project-status">● Auto-saved</span>
         </div>
       </div>
       
       <div className="studio-header-center">
-        <span className="studio-title">D-MAX STUDIO</span>
+        <span className="studio-title">
+          <Sparkles size={14} style={{ marginRight: '6px' }} />
+          D-MAX STUDIO
+        </span>
       </div>
       
       <div className="studio-header-right">
+        <button 
+          className="header-btn secondary" 
+          onClick={openCommandPalette} 
+          title="Command Palette (Ctrl+K)"
+        >
+          <Command size={16} />
+          <span>⌘K</span>
+        </button>
         <button className="header-btn secondary" onClick={handleDownload} title="Download Design">
-          <Download size={18} />
-          <span>Download</span>
+          <Download size={16} />
+          <span>Export</span>
         </button>
         <button className="header-btn secondary" onClick={handleShare} title="Share">
-          <Share2 size={18} />
+          <Share2 size={16} />
         </button>
         <button className="header-btn primary">
-          <ShoppingCart size={18} />
+          <ShoppingCart size={16} />
           <span>Add to Bag</span>
         </button>
       </div>
@@ -61,3 +82,4 @@ const StudioHeader = () => {
 };
 
 export default StudioHeader;
+

@@ -39,6 +39,34 @@ export const GARMENTS = [
   // },
 ];
 
+// Feline Pattern Textures
+export const FELINE_TEXTURES = [
+  {
+    id: "texture-leopard",
+    name: "Leopard Print",
+    src: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=200&h=200&fit=crop",
+    category: "feline",
+  },
+  {
+    id: "texture-tiger",
+    name: "Tiger Stripes",
+    src: "https://images.unsplash.com/photo-1615963244664-5b845b2025ee?w=200&h=200&fit=crop",
+    category: "feline",
+  },
+  {
+    id: "texture-cheetah",
+    name: "Cheetah Spots",
+    src: "https://images.unsplash.com/photo-1456926631375-92c8ce872def?w=200&h=200&fit=crop",
+    category: "feline",
+  },
+  {
+    id: "texture-jaguar",
+    name: "Jaguar Rosettes",
+    src: "https://images.unsplash.com/photo-1551972873-b7e8754e8e26?w=200&h=200&fit=crop",
+    category: "feline",
+  },
+];
+
 export const GRAPHICS = [
   {
     id: "logo-dmax",

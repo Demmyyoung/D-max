@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import StudioHeader from './StudioHeader';
-import Canvas from './Canvas';
+import KonvaCanvas from './KonvaCanvas';
 import LeftSidebar from './LeftSidebar';
 import RightSidebar from './RightSidebar';
 import SlashMenu from './SlashMenu';
+import CommandPalette from './CommandPalette';
 import './Studio.css';
 
 const StudioLayout = () => {
@@ -14,12 +15,13 @@ const StudioLayout = () => {
     <div className="studio-wrapper">
       <StudioHeader />
       <SlashMenu />
+      <CommandPalette />
       <div className="studio-layout">
         <LeftSidebar 
           isOpen={leftSidebarOpen} 
           onToggle={() => setLeftSidebarOpen(!leftSidebarOpen)} 
         />
-        <Canvas />
+        <KonvaCanvas />
         <RightSidebar 
           isOpen={rightSidebarOpen} 
           onToggle={() => setRightSidebarOpen(!rightSidebarOpen)} 
@@ -30,3 +32,4 @@ const StudioLayout = () => {
 };
 
 export default StudioLayout;
+
