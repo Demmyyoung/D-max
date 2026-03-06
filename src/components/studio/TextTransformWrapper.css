@@ -1,0 +1,151 @@
+/* TextTransformWrapper.css
+   ─────────────────────────────────────────────────────────────────
+   Styles for the Direct-Manipulation Text Tool in D-MAX Studio.
+   Design System: "Noir" — White handles on any canvas color.
+   ───────────────────────────────────────────────────────────────── */
+
+/* ── Block wrapper (lift state) ── */
+.text-block-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  box-sizing: border-box;
+  will-change: transform;
+  transition: box-shadow 0.15s ease;
+}
+
+.text-block-wrapper.is-dragging {
+  /* "Lifted" premium feel while moving */
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.28),
+    0 6px 16px rgba(0, 0, 0, 0.16) !important;
+  cursor: grabbing !important;
+  z-index: 200;
+}
+
+/* ── All handles share these base styles ── */
+.text-handle {
+  position: absolute;
+  background-color: #ffffff;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.25),
+    0 0 0 0.5px rgba(255, 255, 255, 0.8);
+  pointer-events: auto;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+  z-index: 70;
+}
+
+/* Hover: all handles grow 1.2× — the "active" cue */
+.text-handle:hover {
+  transform: scale(
+    1.2
+  ) !important; /* override position-specific transforms below */
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.9);
+}
+
+/* ── Corner handles — round circles ── */
+.text-handle-corner {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.text-handle-corner.nw {
+  top: -6px;
+  left: -6px;
+  cursor: nwse-resize;
+}
+
+.text-handle-corner.ne {
+  top: -6px;
+  right: -6px;
+  cursor: nesw-resize;
+}
+
+.text-handle-corner.sw {
+  bottom: -6px;
+  left: -6px;
+  cursor: nesw-resize;
+}
+
+.text-handle-corner.se {
+  bottom: -6px;
+  right: -6px;
+  cursor: nwse-resize;
+}
+
+/* ── Side pill handles — tall narrow rounded rectangles ── */
+.text-handle-pill {
+  width: 6px;
+  height: 28px;
+  border-radius: 3px;
+  top: 50%;
+  /* Default transform: center vertically.
+     NB: :hover overrides this with scale(1.2),
+     which is fine because they are translated by centring first. */
+  transform: translateY(-50%);
+}
+
+.text-handle-pill.w {
+  left: -5px;
+  cursor: ew-resize;
+}
+
+.text-handle-pill.e {
+  right: -5px;
+  cursor: ew-resize;
+}
+
+/* When NOT hovering, we need translateY(-50%) to persist.
+   We achieve this by specifying both in the :hover rule. */
+.text-handle-pill:hover {
+  transform: translateY(-50%) scale(1.2) !important;
+}
+
+/* ── Font-size tooltip ── */
+.text-font-tooltip {
+  position: absolute;
+  background: #111111;
+  color: #ffffff;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 4px 9px;
+  border-radius: 6px;
+  pointer-events: none;
+  white-space: nowrap;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 1px 4px rgba(0, 0, 0, 0.15);
+  z-index: 300;
+  /* Will be positioned via inline style (follows cursor) */
+}
+
+/* ── Smart guide lines (rendered as siblings in workspace) ── */
+.text-guide {
+  position: absolute;
+  pointer-events: none;
+  z-index: 45;
+  /* Purple dashed line */
+  background: none !important;
+}
+
+.text-guide.vertical {
+  width: 0;
+  height: 5000px;
+  top: 0;
+  border-left: 2px dashed #a855f7;
+}
+
+.text-guide.horizontal {
+  height: 0;
+  width: 5000px;
+  left: 0;
+  border-top: 2px dashed #a855f7;
+}

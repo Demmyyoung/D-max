@@ -3,13 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shirt, Type, Image as ImageIcon, ChevronDown, Upload, ChevronLeft, Cat } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { useDesignStore, FELINE_PATTERNS } from '../../store/useDesignStore';
-import { fetchMockups, fetchGraphics } from '../../services/strapi';
+import { fetchGraphics } from '../../services/strapi';
 import { GARMENTS, GRAPHICS as FALLBACK_GRAPHICS, FONTS, COLORS } from '../../data/studioAssets';
 
 const LeftSidebar = ({ isOpen, onToggle }) => {
   const { addLayer, activeGarment, setActiveGarment } = useStudio();
   const addBlock = useDesignStore((state) => state.addBlock);
   const addFelinePattern = useDesignStore((state) => state.addFelinePattern);
+  const blocks = useDesignStore((state) => state.blocks);
+  const selectedIds = useDesignStore((state) => state.selectedIds);
+  const selectedBlocks = blocks.filter(b => selectedIds.includes(b.id));
+  const updateBlock = useDesignStore((state) => state.updateBlock);
+  
   const [expandedSection, setExpandedSection] = useState(null); // Closed by default
   const [mockups, setMockups] = useState(GARMENTS);
   const [graphics, setGraphics] = useState(FALLBACK_GRAPHICS);
@@ -18,10 +23,7 @@ const LeftSidebar = ({ isOpen, onToggle }) => {
   useEffect(() => {
     const loadAssets = async () => {
       try {
-        const mockupsData = await fetchMockups();
-        if (mockupsData && mockupsData.length > 0) {
-          setMockups(mockupsData);
-        }
+        // Mockups are now always loaded from local studioAssets.js (GARMENTS)
         
         const graphicsData = await fetchGraphics();
         if (graphicsData && graphicsData.length > 0) {
@@ -37,15 +39,25 @@ const LeftSidebar = ({ isOpen, onToggle }) => {
     loadAssets();
   }, []);
 
-  const handleAddText = () => {
+  const handleAddText = (e) => {
+    // Determine target based on context (click vs drop)
+    const options = { text: 'YOUR TEXT', fontSize: 28, fontFamily: 'Inter', width: 150, height: 40 };
+    if (e && e.clientX && e.clientY) {
+       // Best effort for click placement
+    }
+    
     // Add to both legacy context and Zustand store
     addLayer({ 
       type: 'text', 
       content: 'YOUR TEXT', 
-      fontSize: 28,
-      fontFamily: 'Inter'
+      ...options
     });
-    addBlock('text', '', { text: 'YOUR TEXT', fontSize: 28, fontFamily: 'Inter', width: 150, height: 40 });
+    addBlock('text', '', options);
+  };
+  
+  const handleDragStart = (e, type, payload) => {
+    e.dataTransfer.setData('application/json', JSON.stringify({ type, payload }));
+    e.dataTransfer.effectAllowed = 'copy';
   };
   
   const handleAddGraphic = (graphic) => {
@@ -188,17 +200,50 @@ const LeftSidebar = ({ isOpen, onToggle }) => {
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                   >
-                    <button className="add-element-btn" onClick={handleAddText}>
+                    <button 
+                      className="add-element-btn" 
+                      onClick={handleAddText}
+                      draggable="true"
+                      onDragStart={(e) => handleDragStart(e, 'text', { text: 'YOUR TEXT', fontSize: 28, fontFamily: 'Inter' })}
+                    >
                       + Add Text Element
                     </button>
                     
+                    {/* If a text block is selected, show edit controls for it */}
+                    {selectedBlocks.length > 0 && selectedBlocks.every(b => b.type === 'text') && (
+                      <div className="text-edit-controls" style={{ marginBottom: '1rem', padding: '0.8rem', background: 'var(--studio-bg-tertiary)', borderRadius: 'var(--studio-radius-sm)' }}>
+                        <div className="color-section" style={{ marginTop: 0 }}>
+                          <label>Text Color</label>
+                          <div className="color-grid small">
+                            {['#FFFFFF', '#000000', '#EF4444', '#F59E0B', '#22C55E', '#3B82F6', '#6366F1', '#EC4899'].map(color => (
+                              <button
+                                key={color}
+                                className={`color-swatch ${(selectedBlocks[0].fill || selectedBlocks[0].color) === color ? 'active' : ''}`}
+                                style={{ backgroundColor: color }}
+                                onClick={() => selectedBlocks.forEach(b => updateBlock(b.id, { fill: color, color }))}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="font-presets">
                       {FONTS.map(font => (
                         <button
                           key={font.name}
                           className="font-preset"
                           style={{ fontFamily: font.name }}
-                          onClick={() => addLayer({ type: 'text', content: 'TEXT', fontFamily: font.name })}
+                          onClick={() => {
+                            if (selectedBlocks.length > 0 && selectedBlocks.every(b => b.type === 'text')) {
+                              selectedBlocks.forEach(b => updateBlock(b.id, { fontFamily: font.name }));
+                            } else {
+                              addLayer({ type: 'text', content: 'TEXT', fontFamily: font.name });
+                              addBlock('text', '', { text: 'TEXT', fontSize: 28, fontFamily: font.name, width: 150, height: 40 });
+                            }
+                          }}
+                          draggable="true"
+                          onDragStart={(e) => handleDragStart(e, 'text', { text: 'TEXT', fontSize: 28, fontFamily: font.name })}
                         >
                           Aa
                           <span>{font.label}</span>

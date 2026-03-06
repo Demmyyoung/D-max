@@ -7,7 +7,7 @@ export const StudioProvider = ({ children }) => {
     id: 't-shirt',
     name: 'Classic T-Shirt',
     color: '#FFFFFF',
-    image: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1780&auto=format&fit=crop'
+    image: '/mockups/tee-1.png'
   });
   
   const [layers, setLayers] = useState([]);

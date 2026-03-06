@@ -77,7 +77,6 @@ const Header = () => {
             scale: logoScale,
             y: logoY, 
             textShadow: textShadow,
-            filter: useTransform(scrollY, [0, travelDistance], ["blur(0px)", "blur(0px)"]) // Placeholder for any filter if needed
           }}
         >
           D-MAX

@@ -5,6 +5,7 @@ import { Undo2, Redo2, Trash2, Hand, MousePointer, Plus, Minus, RotateCcw, ZoomI
 import { useDesignStore } from '../../store/useDesignStore';
 import { useStudio } from '../../context/StudioContext';
 import KonvaBlock from './KonvaBlock';
+import FloatingToolbar from './FloatingToolbar';
 
 /**
  * High-performance Konva-based canvas with direct manipulation
@@ -38,7 +39,9 @@ const KonvaCanvas = () => {
   useEffect(() => {
     if (activeGarment?.image) {
       const img = new window.Image();
-      img.crossOrigin = 'anonymous';
+      if (!activeGarment.image.startsWith('/')) {
+        img.crossOrigin = 'anonymous';
+      }
       img.src = activeGarment.image;
       img.onload = () => setGarmentImage(img);
     }
@@ -55,6 +58,23 @@ const KonvaCanvas = () => {
     updateSize();
     window.addEventListener('resize', updateSize);
     return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  // Zoom handlers
+  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.25, 3));
+  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.25, 0.25));
+  const handleResetView = () => {
+    setZoom(1);
+    setPanOffset({ x: 0, y: 0 });
+  };
+
+  // Mouse wheel zoom
+  const handleWheel = useCallback((e) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      setZoom(prev => Math.max(0.25, Math.min(3, prev + delta)));
+    }
   }, []);
 
   // Keyboard shortcuts
@@ -76,23 +96,6 @@ const KonvaCanvas = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedId, deselectAll]);
-
-  // Zoom handlers
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.25, 3));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.25, 0.25));
-  const handleResetView = () => {
-    setZoom(1);
-    setPanOffset({ x: 0, y: 0 });
-  };
-
-  // Mouse wheel zoom
-  const handleWheel = useCallback((e) => {
-    if (e.ctrlKey || e.metaKey) {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.1 : 0.1;
-      setZoom(prev => Math.max(0.25, Math.min(3, prev + delta)));
-    }
-  }, []);
 
   // Pan handlers
   const handleMouseDown = (e) => {
@@ -247,58 +250,6 @@ const KonvaCanvas = () => {
                 />
               )}
               
-              {/* Whitesmoke Overlay - Masking non-printable area */}
-              {/* Top border */}
-              <Rect
-                x={garmentX}
-                y={garmentY}
-                width={garmentWidth}
-                height={printablePadding}
-                fill="rgba(245, 245, 245, 0.6)"
-                listening={false}
-                cornerRadius={[8, 8, 0, 0]}
-              />
-              {/* Bottom border */}
-              <Rect
-                x={garmentX}
-                y={printableY + printableHeight}
-                width={garmentWidth}
-                height={printablePadding}
-                fill="rgba(245, 245, 245, 0.6)"
-                listening={false}
-                cornerRadius={[0, 0, 8, 8]}
-              />
-              {/* Left border */}
-              <Rect
-                x={garmentX}
-                y={printableY}
-                width={printablePadding}
-                height={printableHeight}
-                fill="rgba(245, 245, 245, 0.6)"
-                listening={false}
-              />
-              {/* Right border */}
-              <Rect
-                x={printableX + printableWidth}
-                y={printableY}
-                width={printablePadding}
-                height={printableHeight}
-                fill="rgba(245, 245, 245, 0.6)"
-                listening={false}
-              />
-              
-              {/* Printable Area border hint */}
-              <Rect
-                x={printableX}
-                y={printableY}
-                width={printableWidth}
-                height={printableHeight}
-                stroke="rgba(0,0,0,0.1)"
-                strokeWidth={1}
-                dash={[5, 5]}
-                listening={false}
-              />
-              
               {/* Design Blocks */}
               {blocks.map((block) => (
                 <KonvaBlock
@@ -311,17 +262,14 @@ const KonvaCanvas = () => {
                   }}
                   isSelected={selectedId === block.id}
                   onSelect={() => selectBlock(block.id)}
-                  bounds={{
-                    x: printableX,
-                    y: printableY,
-                    width: printableWidth,
-                    height: printableHeight
-                  }}
                   centerLines={{ centerX, centerY }}
                 />
               ))}
             </Layer>
           </Stage>
+          
+          {/* God Mode Notion-style floating toolbar rendered precisely over the selected block in World Coordinates */}
+          <FloatingToolbar selectedId={selectedId} />
         </motion.div>
       </div>
       

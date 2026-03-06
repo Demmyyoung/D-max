@@ -1,0 +1,11 @@
+# Copy these values into your Render.com Environment Variables section
+# Make sure to replace the DATABASE_URL with the actual URL from your Render Database!
+
+NODE_ENV=production
+DATABASE_CLIENT=postgres
+DATABASE_URL=postgresql://postgres:22qlNK9H3Mg4V6Qj@db.lexzqoghlikjhmrwjaqg.supabase.co:5432/postgres
+DATABASE_SSL=true
+APP_KEYS=8f7e6d5c4b3a2910,1029384756abcdef
+API_TOKEN_SALT=a1b2c3d4e5f67890abcdef1234567890
+ADMIN_JWT_SECRET=0987654321fedcba0987654321fedcba
+TRANSFER_TOKEN_SALT=1234567890abcdef1234567890abcdef

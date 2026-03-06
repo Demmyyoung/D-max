@@ -3,40 +3,29 @@
 
 export const GARMENTS = [
   {
-    id: "t-shirt-white",
-    name: "Classic Tee (White)",
+    id: "tee-1",
+    name: "Classic Tee",
     color: "#FFFFFF",
-    image:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1780&auto=format&fit=crop",
+    image: "/mockups/tee-1.png",
   },
   {
-    id: "t-shirt-black",
-    name: "Classic Tee (Black)",
-    color: "#1a1a1a",
-    image:
-      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?q=80&w=1887&auto=format&fit=crop",
+    id: "zip-hoodie-1",
+    name: "Zip Hoodie",
+    color: "#FFFFFF",
+    image: "/mockups/zip-hoodie-1.png",
   },
   {
-    id: "hoodie-grey",
-    name: "Pullover Hoodie",
-    color: "#4a4a4a",
-    image:
-      "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=1887&auto=format&fit=crop",
+    id: "puffer-1",
+    name: "Puffer Jacket",
+    color: "#FFFFFF",
+    image: "/mockups/puffer-1.png",
   },
   {
-    id: "sweatshirt",
-    name: "Crewneck",
-    color: "#2F4F4F",
-    image:
-      "https://images.unsplash.com/photo-1578768079052-aa76e52ff62e?q=80&w=1887&auto=format&fit=crop",
+    id: "jeans-1",
+    name: "Denim Jeans",
+    color: "#FFFFFF",
+    image: "/mockups/jeans-1.png",
   },
-  // ===== ADD YOUR OWN MOCKUPS BELOW =====
-  // {
-  //   id: 'custom-mockup-1',
-  //   name: 'My Custom Shirt',
-  //   color: '#FFFFFF',
-  //   image: '/path/to/your/mockup.png'
-  // },
 ];
 
 // Feline Pattern Textures

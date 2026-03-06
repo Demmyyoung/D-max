@@ -44,7 +44,7 @@ export const useDesignStore = create(
     immer((set, get) => ({
       // ===== STATE =====
       blocks: [],
-      selectedId: null,
+      selectedIds: [], // Now an array to support multi-select
       canvasColor: "#ffffff",
       canvasWidth: 400,
       canvasHeight: 500,
@@ -58,8 +58,8 @@ export const useDesignStore = create(
             id: `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             type,
             url: url || "",
-            x: options.x ?? 100,
-            y: options.y ?? 100,
+            x: options.x ?? null,
+            y: options.y ?? null,
             width: options.width ?? 100,
             height: options.height ?? 100,
             scale: options.scale ?? 1,
@@ -77,7 +77,7 @@ export const useDesignStore = create(
             createdAt: Date.now(),
           };
           state.blocks.push(newBlock);
-          state.selectedId = newBlock.id;
+          state.selectedIds = [newBlock.id];
         }),
 
       // Update block attributes (optimistic - instant UI response)
@@ -89,23 +89,36 @@ export const useDesignStore = create(
           }
         }),
 
-      // Delete a block
-      deleteBlock: (id) =>
+      // Delete a block or multiple blocks
+      deleteBlock: (ids) =>
         set((state) => {
-          const index = state.blocks.findIndex((b) => b.id === id);
-          if (index !== -1) {
-            state.blocks.splice(index, 1);
-            if (state.selectedId === id) {
-              state.selectedId = null;
-            }
+          const idsToDelete = Array.isArray(ids) ? ids : [ids];
+          state.blocks = state.blocks.filter(
+            (b) => !idsToDelete.includes(b.id),
+          );
+          state.selectedIds = state.selectedIds.filter(
+            (id) => !idsToDelete.includes(id),
+          );
+        }),
+
+      // Select a single block (replaces selection)
+      selectBlock: (id) => set({ selectedIds: [id] }),
+
+      // Toggle a block in the selection (for Shift-click)
+      toggleBlockSelection: (id) =>
+        set((state) => {
+          if (state.selectedIds.includes(id)) {
+            state.selectedIds = state.selectedIds.filter((i) => i !== id);
+          } else {
+            state.selectedIds.push(id);
           }
         }),
 
-      // Select a block
-      selectBlock: (id) => set({ selectedId: id }),
+      // Select multiple blocks (for marquee selection)
+      selectBlocks: (ids) => set({ selectedIds: ids }),
 
       // Deselect all
-      deselectAll: () => set({ selectedId: null }),
+      deselectAll: () => set({ selectedIds: [] }),
 
       // Set canvas background color
       setCanvasColor: (color) => set({ canvasColor: color }),
@@ -114,7 +127,7 @@ export const useDesignStore = create(
       clearAll: () =>
         set((state) => {
           state.blocks = [];
-          state.selectedId = null;
+          state.selectedIds = [];
         }),
 
       // Duplicate selected block
@@ -130,7 +143,7 @@ export const useDesignStore = create(
               createdAt: Date.now(),
             };
             state.blocks.push(newBlock);
-            state.selectedId = newBlock.id;
+            state.selectedIds = [newBlock.id];
           }
         }),
 
@@ -169,10 +182,18 @@ export const useDesignStore = create(
         }
       },
 
-      // Get selected block
+      // Get selected block (returns first selected block for backwards compatibility)
       getSelectedBlock: () => {
         const state = get();
-        return state.blocks.find((b) => b.id === state.selectedId) || null;
+        return (
+          state.blocks.find((b) => state.selectedIds.includes(b.id)) || null
+        );
+      },
+
+      // Get all selected blocks
+      getSelectedBlocks: () => {
+        const state = get();
+        return state.blocks.filter((b) => state.selectedIds.includes(b.id));
       },
     })),
     {

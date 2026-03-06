@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Download, Share2, Sparkles, Command } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Download, Share2, Command } from 'lucide-react';
 
 const StudioHeader = () => {
   
@@ -51,8 +51,19 @@ const StudioHeader = () => {
       
       <div className="studio-header-center">
         <span className="studio-title">
-          <Sparkles size={14} style={{ marginRight: '6px' }} />
-          D-MAX STUDIO
+          <img
+            src="/logo.png"
+            alt="D-MAX"
+            style={{
+              height: '22px',
+              width: 'auto',
+              objectFit: 'contain',
+              filter: 'brightness(0) invert(1)', /* white logo on dark header */
+              verticalAlign: 'middle',
+              marginRight: '6px',
+            }}
+          />
+          STUDIO
         </span>
       </div>
       

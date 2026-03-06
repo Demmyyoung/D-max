@@ -1079,6 +1079,53 @@
   color: var(--studio-accent);
 }
 
+/* ===== CONTEXT MENU ===== */
+.context-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #334155;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.context-menu-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.context-menu-item.danger {
+  color: #ef4444;
+}
+
+.context-menu-item.danger:hover {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 4px 0;
+  width: 100%;
+}
+
 /* ===== MOBILE RESPONSIVE ===== */
 @media (max-width: 1024px) {
   .studio-layout {
@@ -1107,4 +1154,226 @@
   .project-info {
     display: none;
   }
+}
+
+/* ===== RIGHT SIDEBAR — ZUSTAND LIVE PROPERTIES ===== */
+
+/* Inline value badge next to label (e.g. "44pt") */
+.prop-value {
+  float: right;
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--studio-accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.prop-hint {
+  font-size: 0.6rem;
+  color: var(--studio-text-dim);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* X/Y and W/H number input rows */
+.xy-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.xy-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--studio-bg-tertiary);
+  border: 1px solid var(--studio-border);
+  border-radius: var(--studio-radius-sm);
+  padding: 0.25rem 0.5rem;
+  transition: border-color var(--studio-transition-fast);
+}
+
+.xy-field:focus-within {
+  border-color: var(--studio-accent);
+}
+
+.xy-field span {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--studio-text-dim);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.num-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--studio-text-primary);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Rotation reset button */
+.reset-btn {
+  flex-shrink: 0;
+  padding: 0.25rem;
+  border-radius: 4px;
+  color: var(--studio-text-muted);
+  transition: var(--studio-transition-fast);
+}
+
+.reset-btn:hover {
+  background: var(--studio-bg-elevated);
+  color: var(--studio-accent);
+}
+
+/* Blend mode dropdown */
+.blend-select {
+  width: 100%;
+  background: var(--studio-bg-tertiary);
+  border: 1px solid var(--studio-border);
+  border-radius: var(--studio-radius-sm);
+  color: var(--studio-text-primary);
+  font-size: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--studio-transition-fast);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  padding-right: 1.6rem;
+}
+
+.blend-select:focus,
+.blend-select:hover {
+  border-color: var(--studio-accent);
+}
+
+/* Compact font presets (right sidebar variant) */
+.font-presets.compact {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.3rem;
+}
+
+.font-preset.compact {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--studio-border);
+}
+
+.font-preset.compact.active {
+  border-color: var(--studio-accent);
+  background: var(--studio-accent-bg);
+  color: var(--studio-accent);
+}
+
+/* Native colour picker input in colour swatch row */
+.color-picker-input {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--studio-radius-sm);
+  border: 2px solid var(--studio-border);
+  cursor: pointer;
+  padding: 0;
+  background: none;
+  overflow: hidden;
+  transition:
+    border-color var(--studio-transition-fast),
+    transform var(--studio-transition-fast);
+}
+
+.color-picker-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+.color-picker-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 4px;
+}
+.color-picker-input:hover {
+  border-color: var(--studio-border-hover);
+  transform: scale(1.15);
+}
+
+/* Layer row (right sidebar) */
+.layer-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--studio-radius-sm);
+  font-size: 0.75rem;
+  color: var(--studio-text-secondary);
+  transition: var(--studio-transition-fast);
+  text-align: left;
+}
+
+.layer-row:hover {
+  background: var(--studio-bg-tertiary);
+  color: var(--studio-text-primary);
+}
+.layer-row.active {
+  background: var(--studio-accent-bg);
+  color: var(--studio-accent);
+}
+
+.layer-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 0.15rem;
+  opacity: 0;
+  transition: opacity var(--studio-transition-fast);
+}
+
+.layer-row:hover .layer-actions,
+.layer-row.active .layer-actions {
+  opacity: 1;
+}
+
+.layer-action-btn {
+  padding: 0.2rem;
+  border-radius: 3px;
+  color: var(--studio-text-muted);
+  transition: var(--studio-transition-fast);
+}
+
+.layer-action-btn:hover {
+  background: var(--studio-bg-elevated);
+  color: var(--studio-text-primary);
+}
+
+.layer-type {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: var(--studio-bg-elevated);
+  color: var(--studio-accent);
+  flex-shrink: 0;
+}
+
+.layer-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Slider row with optional trailing reset button */
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.slider-row input[type="range"] {
+  flex: 1;
 }

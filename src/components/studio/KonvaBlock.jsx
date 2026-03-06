@@ -1,6 +1,33 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Image as KonvaImage, Text, Transformer, Group, Line } from 'react-konva';
+import { Image as KonvaImage, Text, Transformer, Group, Line, Rect } from 'react-konva';
 import { useDesignStore } from '../../store/useDesignStore';
+
+// Web Audio API to play a subtle "pop" sound on snap
+const playSnapSound = () => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(600, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.05);
+    
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start();
+    osc.stop(ctx.currentTime + 0.05);
+  } catch(e) {
+    // Silently fail if audio context isn't allowed initially
+  }
+};
 
 /**
  * Individual block component rendered on Konva canvas
@@ -18,7 +45,10 @@ const KonvaBlock = ({ block, isSelected, onSelect, bounds, centerLines }) => {
   useEffect(() => {
     if (block.type === 'image' || block.type === 'pattern') {
       const img = new window.Image();
-      img.crossOrigin = 'anonymous';
+      // Only set crossOrigin for external URLs, not for uploaded local base64 data URIs or local static paths
+      if (block.url && !block.url.startsWith('data:') && !block.url.startsWith('/')) {
+        img.crossOrigin = 'anonymous';
+      }
       img.src = block.url;
       img.onload = () => setImage(img);
     }
@@ -42,39 +72,20 @@ const KonvaBlock = ({ block, isSelected, onSelect, bounds, centerLines }) => {
     });
   };
 
-  // The "Anti-Bug" Logic & Boundary Safety
+  // Unrestricted Dragging
   const dragBoundFunc = (pos) => {
-    if (!bounds) return pos;
-
     let newX = pos.x;
     let newY = pos.y;
     
-    // Account for node width/height for boundary if scale is 1
-    const node = shapeRef.current;
-    
-    // For text components and images that use strict offset rendering
-    const rectWidth = node ? node.width() * node.scaleX() : block.width;
-    const rectHeight = node ? node.height() * node.scaleY() : block.height;
-    
-    // If element is offset relative to its center, adjust boundary checks. 
-    // Usually images are drawn top-left (0,0 offset).
-    
-    // Safety Rails (Boundary Locking)
-    if (newX < bounds.x) newX = bounds.x;
-    if (newY < bounds.y) newY = bounds.y;
-    if (newX + rectWidth > bounds.x + bounds.width) {
-      newX = bounds.x + bounds.width - rectWidth;
-    }
-    if (newY + rectHeight > bounds.y + bounds.height) {
-      newY = bounds.y + bounds.height - rectHeight;
-    }
-
     // Snapping Logic
     let snapX = false;
     let snapY = false;
 
     if (centerLines) {
       const snapThreshold = 15;
+      const node = shapeRef.current;
+      const rectWidth = node ? node.width() * node.scaleX() : block.width;
+      const rectHeight = node ? node.height() * node.scaleY() : block.height;
       
       // Calculate object's physical center in the absolute canvas
       const objCenterX = newX + (rectWidth / 2);
@@ -92,11 +103,10 @@ const KonvaBlock = ({ block, isSelected, onSelect, bounds, centerLines }) => {
         snapY = true;
       }
 
-      // Haptic feedback pulse on snap
+      // Haptic feedback pulse and subtle pop on new snap
       if ((snapX && !isSnappingX) || (snapY && !isSnappingY)) {
-        if (navigator.vibrate) {
-          navigator.vibrate(20); // light tap
-        }
+        if (navigator.vibrate) navigator.vibrate(20); // light tap
+        playSnapSound();
       }
 
       setIsSnappingX(snapX);
@@ -148,6 +158,9 @@ const KonvaBlock = ({ block, isSelected, onSelect, bounds, centerLines }) => {
     },
     dragBoundFunc: dragBoundFunc,
     onTransformEnd: handleTransformEnd,
+    shadowColor: (isSnappingX || isSnappingY) ? '#6366f1' : 'transparent',
+    shadowBlur: (isSnappingX || isSnappingY) ? 20 : 0,
+    shadowOpacity: (isSnappingX || isSnappingY) ? 0.8 : 0,
   };
 
   return (
