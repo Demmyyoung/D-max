@@ -39,7 +39,7 @@ const Home = () => {
         
         <div className="container" style={{ position: 'relative', zIndex: 20, background: 'var(--bg-primary)' }}>
            <div className="content-spacer" style={{ height: '100px' }}></div>
-           <div className="section-header" style={{ marginBottom: '3rem' }}>
+           <div className="drops-section-header" style={{ marginBottom: '3rem' }}>
               <h1 style={{ fontSize: '3rem', fontWeight: 600, letterSpacing: '-0.03em' }}>Latest Drops</h1>
            </div>
            <ProductGrid />

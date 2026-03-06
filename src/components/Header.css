@@ -78,17 +78,6 @@
   justify-content: center;
   align-items: center;
   z-index: 51;
-  mix-blend-mode: exclusion; /* Cool effect */
-  color: white; /* Since mix-blend-mode exclusion on light bg makes it black-ish? */
-}
-
-/* Actually, user wanted Black text on White bg. Exclusion on white bg flips black to white...
-If bg is #FAFAFA (white-ish), exclusion text needs to be White to appear Black? 
-White (1,1,1) diff White (1,1,1) = Black (0,0,0).
-So if I set color: white; it will look black on white bg.
-But if it overlaps generic content, it adapts.
-Let's stick to normal color first appropriately. */
-.brand-logo {
   mix-blend-mode: normal;
   color: var(--text-primary);
 }

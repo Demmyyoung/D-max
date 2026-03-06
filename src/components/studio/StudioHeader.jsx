@@ -1,12 +1,39 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ShoppingCart, Download, Share2, Command } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
+import { useDesignStore } from '../../store/useDesignStore';
 
 const StudioHeader = () => {
+  const { addToCart } = useCart();
+  const { blocks, canvasColor } = useDesignStore();
   
   const handleDownload = () => {
     // For now, show a message - in production this would use a server-side rendering service
     alert('To download your design:\n\n1. Right-click on the garment preview\n2. Select "Save image as..."\n\nFor high-quality exports, the full version uses server-side rendering.');
+  };
+
+  const handleAddToBag = () => {
+    if (blocks.length === 0) {
+      alert('Your design is empty! Add some graphics or text first.');
+      return;
+    }
+
+    // Capture current design as a virtual product
+    const customProduct = {
+      id: `custom-${Date.now()}`,
+      name: 'Custom D-MAX Piece',
+      price: 125.00, // Premium price for custom designs
+      image: '/garments/hoodie-front.png', // Fallback to current garment view
+      isCustom: true,
+      designData: {
+        blocks,
+        canvasColor
+      }
+    };
+
+    addToCart(customProduct);
+    alert('Design added to your bag!');
   };
   
   const handleShare = async () => {
@@ -83,7 +110,7 @@ const StudioHeader = () => {
         <button className="header-btn secondary" onClick={handleShare} title="Share">
           <Share2 size={16} />
         </button>
-        <button className="header-btn primary">
+        <button className="header-btn primary" onClick={handleAddToBag}>
           <ShoppingCart size={16} />
           <span>Add to Bag</span>
         </button>

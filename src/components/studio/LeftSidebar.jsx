@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shirt, Type, Image as ImageIcon, ChevronDown, Upload, ChevronLeft, Cat } from 'lucide-react';
 import { useStudio } from '../../context/StudioContext';
 import { useDesignStore, FELINE_PATTERNS } from '../../store/useDesignStore';
-import { fetchGraphics } from '../../services/strapi';
+import { fetchGraphics } from '../../services/sanity';
 import { GARMENTS, GRAPHICS as FALLBACK_GRAPHICS, FONTS, COLORS } from '../../data/studioAssets';
 
 const LeftSidebar = ({ isOpen, onToggle }) => {
@@ -30,7 +30,7 @@ const LeftSidebar = ({ isOpen, onToggle }) => {
           setGraphics(graphicsData);
         }
       } catch (err) {
-        console.log('Using fallback assets (Strapi unavailable)');
+        console.log('Using fallback assets (Sanity unavailable)');
       }
       
       setLoading(false);

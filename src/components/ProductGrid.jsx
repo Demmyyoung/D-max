@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
-import { fetchProducts } from '../services/strapi';
+import { fetchProducts } from '../services/sanity';
 import './ProductGrid.css';
 
 // Fallback products if Strapi is not running
@@ -49,7 +49,7 @@ const ProductGrid = () => {
       if (data.length > 0) {
         setProducts(data);
       } else {
-        // Use fallback if Strapi is not running
+        // Use fallback if Sanity is not running
         setProducts(FALLBACK_PRODUCTS);
       }
       setLoading(false);

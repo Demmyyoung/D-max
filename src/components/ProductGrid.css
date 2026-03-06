@@ -37,7 +37,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.02);
+  background: transparent;
   display: flex;
   align-items: flex-end; /* Button at bottom */
   padding: 1.5rem;
