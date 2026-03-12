@@ -5,6 +5,7 @@ import { useStudio } from '../../context/StudioContext';
 import TransformWrapper from './TransformWrapper';
 import TextTransformWrapper from './TextTransformWrapper';
 import FloatingAddButton from './FloatingAddButton';
+import ContextToolbar from './ContextToolbar';
 import './BigCanvas.css';
 
 const WORKSPACE_SIZE = 5000;
@@ -57,6 +58,12 @@ const BigCanvas = () => {
   const dragMouseStart = useRef({ x: 0, y: 0 });
   // Snapshot of camera.zoom at drag start (avoids stale closure)
   const dragZoomRef = useRef(1);
+  
+  // Touch/Pinch tracking
+  const touches = useRef({});
+  const initialPinchDist = useRef(null);
+  const initialPinchZoom = useRef(null);
+  const initialPinchMid = useRef(null);
   
   const [localBlocks, setLocalBlocks] = useState({}); // { id: { x, y, width, height, scale, rotation } }
 
@@ -234,6 +241,25 @@ const BigCanvas = () => {
   };
 
   const handlePointerDown = (e) => {
+    // Track pointer
+    touches.current[e.pointerId] = { x: e.clientX, y: e.clientY };
+    const touchIds = Object.keys(touches.current);
+
+    // Initial Pinch
+    if (touchIds.length === 2) {
+      const p1 = touches.current[touchIds[0]];
+      const p2 = touches.current[touchIds[1]];
+      initialPinchDist.current = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+      initialPinchZoom.current = camera.zoom;
+      
+      const rect = containerRef.current.getBoundingClientRect();
+      initialPinchMid.current = {
+        x: (p1.x + p2.x) / 2 - rect.left,
+        y: (p1.y + p2.y) / 2 - rect.top
+      };
+      return;
+    }
+
     const blockElement = e.target.closest('[data-block-id]');
     const targetId = blockElement ? blockElement.getAttribute('data-block-id') : null;
     
@@ -307,6 +333,34 @@ const BigCanvas = () => {
   };
 
   const handlePointerMove = (e) => {
+    if (touches.current[e.pointerId]) {
+      touches.current[e.pointerId] = { x: e.clientX, y: e.clientY };
+    }
+    const touchIds = Object.keys(touches.current);
+
+    // Handle Pinch Zoom
+    if (touchIds.length === 2 && initialPinchDist.current) {
+      const p1 = touches.current[touchIds[0]];
+      const p2 = touches.current[touchIds[1]];
+      const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+      const factor = dist / initialPinchDist.current;
+      
+      const newZoom = Math.max(minZoom, Math.min(MAX_ZOOM, initialPinchZoom.current * factor));
+      const mid = initialPinchMid.current;
+
+      setCamera((prev) => {
+        const worldX = prev.x + (mid.x - containerSize.width / 2) / prev.zoom;
+        const worldY = prev.y + (mid.y - containerSize.height / 2) / prev.zoom;
+
+        const unclampedX = worldX - (mid.x - containerSize.width / 2) / newZoom;
+        const unclampedY = worldY - (mid.y - containerSize.height / 2) / newZoom;
+
+        const clamped = clampCamera(unclampedX, unclampedY, newZoom);
+        return { x: clamped.x, y: clamped.y, zoom: newZoom };
+      });
+      return;
+    }
+
     if (isPanning) {
       const deltaX = e.clientX - lastMousePos.current.x;
       const deltaY = e.clientY - lastMousePos.current.y;
@@ -411,6 +465,12 @@ const BigCanvas = () => {
   };
 
   const handlePointerUp = (e) => {
+    delete touches.current[e.pointerId];
+    if (Object.keys(touches.current).length < 2) {
+      initialPinchDist.current = null;
+      initialPinchZoom.current = null;
+    }
+
     if (isPanning) {
       setIsPanning(false);
       if (e.target.hasPointerCapture(e.pointerId)) {
@@ -603,6 +663,8 @@ const BigCanvas = () => {
                 storeBlocks={storeBlocks}
                 WORKSPACE_SIZE={workspaceSize}
                 isDragging={isBlockDragging}
+                setEditingBlockId={setEditingBlockId}
+                editingBlockId={editingBlockId}
               />
             );
           }
@@ -649,6 +711,7 @@ const BigCanvas = () => {
                     pointerEvents: 'none',
                     mixBlendMode: block.blendMode || 'normal',
                     opacity: block.opacity ?? 1,
+                    transform: block.flipX ? 'scaleX(-1)' : 'none',
                   }}
                 />
               ) : (
@@ -731,6 +794,16 @@ const BigCanvas = () => {
           <RotateCcw size={22} />
         </button>
       </div>
+
+      {/* Contextual Toolbar for selected block */}
+      {selectedId && (
+        <ContextToolbar
+          selectedId={selectedId}
+          localBlocks={localBlocks}
+          camera={camera}
+          containerSize={containerSize}
+        />
+      )}
 
       {/* Context Menu */}
       {contextMenu.visible && (

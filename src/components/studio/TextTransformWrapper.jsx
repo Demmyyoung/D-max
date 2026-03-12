@@ -26,7 +26,14 @@ const TextTransformWrapper = ({
   storeBlocks,
   WORKSPACE_SIZE = 5000,
   isDragging = false,
+  setEditingBlockId,
 }) => {
+  // ... (rest of the component) ...
+
+  const handleDoubleClick = (e) => {
+    e.stopPropagation();
+    if (setEditingBlockId) setEditingBlockId(block.id);
+  };
   // ─── Refs (zero state during drag) ────────────────────────────────────────
   const blockRef        = useRef(null);
   const textContentRef  = useRef(null);
@@ -142,7 +149,7 @@ const TextTransformWrapper = ({
       tooltipRef.current.style.display = 'block';
       tooltipRef.current.style.left = `${u.tooltipX}px`;
       tooltipRef.current.style.top  = `${u.tooltipY}px`;
-      tooltipRef.current.style.transform = `scale(${1 / camera.zoom})`;
+      tooltipRef.current.style.transform = `scale(${1 / camera.zoom}) translate(16px, 16px)`;
       tooltipRef.current.style.transformOrigin = '0 0';
     }
 
@@ -386,6 +393,7 @@ const TextTransformWrapper = ({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
+        onDoubleClick={handleDoubleClick}
       >
         {/* ── Text content ── */}
         <div

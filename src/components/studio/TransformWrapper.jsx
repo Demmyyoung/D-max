@@ -567,7 +567,7 @@ const TransformWrapper = ({
            style={{ 
              left: tooltip.x, 
              top: tooltip.y,
-             transform: `scale(${1 / camera.zoom})`,
+             transform: `scale(${1 / camera.zoom}) translate(15px, 15px)`,
              transformOrigin: '0 0'
            }}
          >
