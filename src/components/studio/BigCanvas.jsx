@@ -683,22 +683,6 @@ const BigCanvas = () => {
       {/* Bottom Navigation Dock */}
       <div className="canvas-bottom-dock">
         {/* Tools */}
-        <div className="dock-group">
-          <button 
-            className={`dock-btn ${activeTool === 'select' ? 'active' : ''}`}
-            onClick={() => setActiveTool('select')}
-            title="Select Tool (V)"
-          >
-            <MousePointer size={22} />
-          </button>
-          <button 
-            className={`dock-btn ${activeTool === 'pan' ? 'active' : ''}`}
-            onClick={() => setActiveTool('pan')}
-            title="Pan Tool (H)"
-          >
-            <Hand size={22} />
-          </button>
-        </div>
 
         <div className="dock-divider"></div>
 

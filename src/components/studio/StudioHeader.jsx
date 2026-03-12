@@ -10,7 +10,7 @@ const StudioHeader = () => {
   
   const handleDownload = () => {
     // For now, show a message - in production this would use a server-side rendering service
-    alert('To download your design:\n\n1. Right-click on the garment preview\n2. Select "Save image as..."\n\nFor high-quality exports, the full version uses server-side rendering.');
+    console.log('Export coming in Phase 5');
   };
 
   const handleAddToBag = () => {
@@ -23,7 +23,7 @@ const StudioHeader = () => {
     const customProduct = {
       id: `custom-${Date.now()}`,
       name: 'Custom D-MAX Piece',
-      price: 125.00, // Premium price for custom designs
+      price: 0, // Placeholder price until defined
       image: '/garments/hoodie-front.png', // Fallback to current garment view
       isCustom: true,
       designData: {
@@ -53,15 +53,6 @@ const StudioHeader = () => {
     }
   };
 
-  const openCommandPalette = () => {
-    // Dispatch Ctrl+K event to open command palette
-    const event = new KeyboardEvent('keydown', {
-      key: 'k',
-      ctrlKey: true,
-      bubbles: true
-    });
-    document.dispatchEvent(event);
-  };
 
   return (
     <header className="studio-header">
@@ -95,14 +86,6 @@ const StudioHeader = () => {
       </div>
       
       <div className="studio-header-right">
-        <button 
-          className="header-btn secondary" 
-          onClick={openCommandPalette} 
-          title="Command Palette (Ctrl+K)"
-        >
-          <Command size={16} />
-          <span>⌘K</span>
-        </button>
         <button className="header-btn secondary" onClick={handleDownload} title="Download Design">
           <Download size={16} />
           <span>Export</span>
