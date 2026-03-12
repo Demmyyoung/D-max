@@ -14,7 +14,7 @@
   will-change: transform, outline-color;
   z-index: 50;
   cursor: grab;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: none !important;
 }
 
@@ -29,75 +29,40 @@
 /* 8 Resize Handles */
 .transform-handle {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 11px;
+  height: 11px;
   background-color: #ffffff;
   border: 1.5px solid rgba(0, 0, 0, 0.15);
   border-radius: 50%;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 
+    0 1px 4px rgba(0, 0, 0, 0.25),
+    0 0 0 0.5px rgba(255, 255, 255, 0.8);
   z-index: 60;
   pointer-events: auto;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .transform-handle:hover {
-  transform: scale(1.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.2) !important;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.9);
 }
 
-.transform-handle.nw {
-  top: -5px;
-  left: -5px;
-  cursor: nwse-resize;
-}
+.transform-handle.nw { top: -5.5px; left: -5.5px; cursor: nwse-resize; }
+.transform-handle.ne { top: -5.5px; right: -5.5px; cursor: nesw-resize; }
+.transform-handle.sw { bottom: -5.5px; left: -5.5px; cursor: nesw-resize; }
+.transform-handle.se { bottom: -5.5px; right: -5.5px; cursor: nwse-resize; }
+.transform-handle.n  { top: -5.5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.transform-handle.s  { bottom: -5.5px; left: 50%; transform: translateX(-50%); cursor: ns-resize; }
+.transform-handle.e  { top: 50%; right: -5.5px; transform: translateY(-50%); cursor: ew-resize; }
+.transform-handle.w  { top: 50%; left: -5.5px; transform: translateY(-50%); cursor: ew-resize; }
 
-.transform-handle.n {
-  top: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  cursor: ns-resize;
-}
-
-.transform-handle.ne {
-  top: -5px;
-  right: -5px;
-  cursor: nesw-resize;
-}
-
-.transform-handle.e {
-  top: 50%;
-  right: -5px;
-  transform: translateY(-50%);
-  cursor: ew-resize;
-}
-
-.transform-handle.se {
-  bottom: -5px;
-  right: -5px;
-  cursor: nwse-resize;
-}
-
-.transform-handle.s {
-  bottom: -5px;
-  left: 50%;
-  transform: translateX(-50%);
-  cursor: ns-resize;
-}
-
-.transform-handle.sw {
-  bottom: -5px;
-  left: -5px;
-  cursor: nesw-resize;
-}
-
-.transform-handle.w {
-  top: 50%;
-  left: -5px;
-  transform: translateY(-50%);
-  cursor: ew-resize;
-}
+/* For the centered handles, hover must preserve their translation */
+.transform-handle.n:hover { transform: translateX(-50%) scale(1.2) !important; }
+.transform-handle.s:hover { transform: translateX(-50%) scale(1.2) !important; }
+.transform-handle.e:hover { transform: translateY(-50%) scale(1.2) !important; }
+.transform-handle.w:hover { transform: translateY(-50%) scale(1.2) !important; }
 
 /* Responsive Feed Tooltip */
 .transform-tooltip {
@@ -121,7 +86,7 @@
 .smart-guide {
   position: absolute;
   pointer-events: none;
-  z-index: 40;
+  z-index: 120;
   background: none;
 }
 
@@ -141,29 +106,54 @@
 
 .transform-handle-pill {
   position: absolute;
-  width: 6px;
-  height: 40px;
   background: #ffffff;
   border: 1.5px solid rgba(0, 0, 0, 0.15);
   border-radius: 3px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 
+    0 1px 4px rgba(0, 0, 0, 0.25),
+    0 0 0 0.5px rgba(255, 255, 255, 0.8);
   z-index: 60;
   pointer-events: auto;
-  top: 50%;
-  transform: translateY(-50%);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
-  cursor: ew-resize;
-}
-
-.transform-handle-pill:hover {
-  transform: translateY(-50%) scale(1.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .transform-handle-pill.w {
-  left: -5px;
+  width: 6px;
+  height: 40px;
+  top: 50%;
+  left: -4px;
+  transform: translateY(-50%);
+  cursor: ew-resize;
 }
 
 .transform-handle-pill.e {
-  right: -5px;
+  width: 6px;
+  height: 40px;
+  top: 50%;
+  right: -4px;
+  transform: translateY(-50%);
+  cursor: ew-resize;
 }
+
+.transform-handle-pill.n {
+  width: 40px;
+  height: 6px;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.transform-handle-pill.s {
+  width: 40px;
+  height: 6px;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+}
+
+.transform-handle-pill.w:hover { transform: translateY(-50%) scale(1.2) !important; }
+.transform-handle-pill.e:hover { transform: translateY(-50%) scale(1.2) !important; }
+.transform-handle-pill.n:hover { transform: translateX(-50%) scale(1.2) !important; }
+.transform-handle-pill.s:hover { transform: translateX(-50%) scale(1.2) !important; }

@@ -142,6 +142,8 @@ const TextTransformWrapper = ({
       tooltipRef.current.style.display = 'block';
       tooltipRef.current.style.left = `${u.tooltipX}px`;
       tooltipRef.current.style.top  = `${u.tooltipY}px`;
+      tooltipRef.current.style.transform = `scale(${1 / camera.zoom})`;
+      tooltipRef.current.style.transformOrigin = '0 0';
     }
 
     // 4. Guides (no React state involved)
@@ -214,8 +216,8 @@ const TextTransformWrapper = ({
       rotation: sd.rotation,
       fontSize: newFontSize,
       tooltipText: `${newFontSize}pt`,
-      tooltipX: parentRect ? e.clientX - parentRect.left + 16 : 16,
-      tooltipY: parentRect ? e.clientY - parentRect.top  + 16 : 16,
+      tooltipX: parentRect ? (e.clientX - parentRect.left) / camera.zoom + 16 / camera.zoom : 16,
+      tooltipY: parentRect ? (e.clientY - parentRect.top) / camera.zoom + 16 / camera.zoom : 16,
     });
   };
 

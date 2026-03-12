@@ -55,7 +55,7 @@
   border-radius: 8px;
   cursor: grab;
   user-select: none;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: none;
   transform-origin: 0 0; /* Important for exact positioning */
 }
 
