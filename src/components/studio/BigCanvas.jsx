@@ -4,6 +4,7 @@ import { useDesignStore } from '../../store/useDesignStore';
 import { useStudio } from '../../context/StudioContext';
 import TransformWrapper from './TransformWrapper';
 import TextTransformWrapper from './TextTransformWrapper';
+import FloatingAddButton from './FloatingAddButton';
 import './BigCanvas.css';
 
 const WORKSPACE_SIZE = 5000;
@@ -571,7 +572,7 @@ const BigCanvas = () => {
               backgroundSize: 'contain',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              opacity: 0.1,
+              opacity: 0.85,
               pointerEvents: 'none' // Silhouette shouldn't interfere with interactions
             }}
           />
@@ -713,6 +714,11 @@ const BigCanvas = () => {
             <Plus size={22} />
           </button>
         </div>
+
+        <div className="dock-divider"></div>
+
+        {/* Add Button Centerpiece */}
+        <FloatingAddButton />
 
         <div className="dock-divider"></div>
 

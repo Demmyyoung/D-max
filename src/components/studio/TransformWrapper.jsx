@@ -20,6 +20,10 @@ const TransformWrapper = ({
   const [isResizing, setIsResizing] = useState(false);
   const [resizeHandle, setResizeHandle] = useState(null);
   const [tooltip, setTooltip] = useState({ visible: false, text: '', x: 0, y: 0 });
+  const [isCropMode, setIsCropMode] = useState(false);
+  const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
+  const [imageScale, setImageScale] = useState(1);
+  const cropDragStart = useRef(null);
   const blockRef = useRef(null);
   
   // Track starting bounds for resize math
@@ -154,6 +158,64 @@ const TransformWrapper = ({
     }
   };
 
+  const handleDoubleClick = (e) => {
+    if (block.type !== 'image') return;
+    e.stopPropagation();
+    setIsCropMode(true);
+  };
+
+  const handleCropPointerDown = (e) => {
+    if (!isCropMode) return;
+    e.stopPropagation();
+    cropDragStart.current = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      startOffsetX: imageOffset.x,
+      startOffsetY: imageOffset.y,
+    };
+    e.target.setPointerCapture(e.pointerId);
+  };
+
+  const handleCropPointerMove = (e) => {
+    if (!isCropMode || !cropDragStart.current) return;
+    const deltaX = (e.clientX - cropDragStart.current.mouseX) / camera.zoom;
+    const deltaY = (e.clientY - cropDragStart.current.mouseY) / camera.zoom;
+    setImageOffset({
+      x: cropDragStart.current.startOffsetX + deltaX,
+      y: cropDragStart.current.startOffsetY + deltaY,
+    });
+  };
+
+  const handleCropPointerUp = (e) => {
+    if (!cropDragStart.current) return;
+    cropDragStart.current = null;
+    if (e.target.hasPointerCapture(e.pointerId)) {
+      e.target.releasePointerCapture(e.pointerId);
+    }
+    // Save offset to store
+    useDesignStore.getState().updateBlock(block.id, {
+      imageOffsetX: imageOffset.x,
+      imageOffsetY: imageOffset.y,
+    });
+  };
+
+  React.useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (isCropMode && blockRef.current && !blockRef.current.contains(e.target)) {
+        setIsCropMode(false);
+      }
+    };
+    window.addEventListener('mousedown', handleClickOutside);
+    return () => window.removeEventListener('mousedown', handleClickOutside);
+  }, [isCropMode]);
+
+  React.useEffect(() => {
+    setImageOffset({
+      x: block.imageOffsetX || 0,
+      y: block.imageOffsetY || 0,
+    });
+  }, [block.id, block.imageOffsetX, block.imageOffsetY]);
+
   if (!isSelected || activeTool !== 'select') {
     return (
       <div 
@@ -170,7 +232,52 @@ const TransformWrapper = ({
           zIndex: isDragging ? 200 : 50,
         }}
       >
-        {children}
+        {block.type === 'image' ? (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              overflow: 'hidden',
+              borderRadius: 'inherit',
+              cursor: isCropMode ? 'move' : 'inherit',
+            }}
+          >
+            <img
+              data-block-id={block.id}
+              src={block.url}
+              alt={block.name || 'image'}
+              onDoubleClick={handleDoubleClick}
+              onPointerDown={handleCropPointerDown}
+              onPointerMove={handleCropPointerMove}
+              onPointerUp={handleCropPointerUp}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: `translate(calc(-50% + ${imageOffset.x}px), calc(-50% + ${imageOffset.y}px)) scale(${imageScale})`,
+                minWidth: '100%',
+                minHeight: '100%',
+                width: 'auto',
+                height: 'auto',
+                objectFit: 'none',
+                pointerEvents: isCropMode ? 'auto' : 'none',
+                userSelect: 'none',
+                maxWidth: 'none',
+              }}
+            />
+            {/* Crop mode overlay — darkens the clipped areas */}
+            {isCropMode && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                boxShadow: 'inset 0 0 0 3px #000',
+                borderRadius: 'inherit',
+                pointerEvents: 'none',
+                zIndex: 10,
+              }} />
+            )}
+          </div>
+        ) : children}
       </div>
     );
   }
@@ -181,38 +288,119 @@ const TransformWrapper = ({
 
   return (
     <>
-      <motion.div
+      <div
         ref={blockRef}
         data-block-id={block.id}
         className={`canvas-block selected transform-wrapper${isDragging ? ' is-dragging' : ''}`}
-        initial={{ outlineColor: 'transparent', outlineWidth: 0 }}
-        animate={{ outlineColor: '#E2E8F0', outlineWidth: 1 }}
         style={{
           width: `${localPos.width}px`,
           height: `${localPos.height}px`,
           transform: `translate3d(${localPos.x}px, ${localPos.y}px, 0) rotate(${localPos.rotation}deg)`,
           transformOrigin: '50% 50%',
           opacity: block.opacity || 1,
-          outlineStyle: 'solid',
           willChange: 'transform',
           zIndex: isDragging ? 200 : 50,
+          outline: '1px solid rgba(0, 0, 0, 0.25)',
+          boxShadow: 'none',
         }}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        {children}
+        {block.type === 'image' ? (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              overflow: 'hidden',
+              borderRadius: 'inherit',
+              cursor: isCropMode ? 'move' : 'inherit',
+            }}
+          >
+            <img
+              data-block-id={block.id}
+              src={block.url}
+              alt={block.name || 'image'}
+              onDoubleClick={handleDoubleClick}
+              onPointerDown={handleCropPointerDown}
+              onPointerMove={handleCropPointerMove}
+              onPointerUp={handleCropPointerUp}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: `translate(calc(-50% + ${imageOffset.x}px), calc(-50% + ${imageOffset.y}px)) scale(${imageScale})`,
+                minWidth: '100%',
+                minHeight: '100%',
+                width: 'auto',
+                height: 'auto',
+                objectFit: 'none',
+                pointerEvents: isCropMode ? 'auto' : 'none',
+                userSelect: 'none',
+                maxWidth: 'none',
+              }}
+            />
+            {/* Crop mode overlay — darkens the clipped areas */}
+            {isCropMode && (
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                boxShadow: 'inset 0 0 0 3px #000',
+                borderRadius: 'inherit',
+                pointerEvents: 'none',
+                zIndex: 10,
+              }} />
+            )}
+          </div>
+        ) : children}
+
+        {isCropMode && (
+          <button
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => setIsCropMode(false)}
+            style={{
+              position: 'absolute',
+              top: '-36px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              background: '#000000',
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '100px',
+              padding: '6px 16px',
+              fontSize: '0.7rem',
+              fontWeight: 700,
+              letterSpacing: '0.05em',
+              cursor: 'pointer',
+              zIndex: 300,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            ✓ Done
+          </button>
+        )}
 
         {/* 8 Handles */}
-        <div className="transform-handle nw" onPointerDown={(e) => startResize(e, 'nw')} />
-        <div className="transform-handle n" onPointerDown={(e) => startResize(e, 'n')} />
-        <div className="transform-handle ne" onPointerDown={(e) => startResize(e, 'ne')} />
-        <div className="transform-handle e" onPointerDown={(e) => startResize(e, 'e')} />
-        <div className="transform-handle se" onPointerDown={(e) => startResize(e, 'se')} />
-        <div className="transform-handle s" onPointerDown={(e) => startResize(e, 's')} />
-        <div className="transform-handle sw" onPointerDown={(e) => startResize(e, 'sw')} />
-        <div className="transform-handle w" onPointerDown={(e) => startResize(e, 'w')} />
-      </motion.div>
+        {!isCropMode && (
+          block.type === 'image' ? (
+            <>
+              <div className="transform-handle-pill w" onPointerDown={(e) => startResize(e, 'w')} />
+              <div className="transform-handle-pill e" onPointerDown={(e) => startResize(e, 'e')} />
+            </>
+          ) : (
+            <>
+              <div className="transform-handle nw" onPointerDown={(e) => startResize(e, 'nw')} />
+              <div className="transform-handle n" onPointerDown={(e) => startResize(e, 'n')} />
+              <div className="transform-handle ne" onPointerDown={(e) => startResize(e, 'ne')} />
+              <div className="transform-handle e" onPointerDown={(e) => startResize(e, 'e')} />
+              <div className="transform-handle se" onPointerDown={(e) => startResize(e, 'se')} />
+              <div className="transform-handle s" onPointerDown={(e) => startResize(e, 's')} />
+              <div className="transform-handle sw" onPointerDown={(e) => startResize(e, 'sw')} />
+              <div className="transform-handle w" onPointerDown={(e) => startResize(e, 'w')} />
+            </>
+          )
+        )}
+      </div>
 
       {/* Smart Guides rendered relative to workspace */}
       {isResizing && isCenterAlignedX && (

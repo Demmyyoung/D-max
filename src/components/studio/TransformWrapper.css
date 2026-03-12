@@ -14,6 +14,12 @@
   will-change: transform, outline-color;
   z-index: 50;
   cursor: grab;
+  overflow: hidden;
+  box-shadow: none !important;
+}
+
+.canvas-block.selected {
+  box-shadow: none !important;
 }
 
 .transform-wrapper:active {
@@ -131,4 +137,33 @@
   width: 5000px;
   left: 0;
   border-top: 2px dashed #a855f7;
+}
+
+.transform-handle-pill {
+  position: absolute;
+  width: 6px;
+  height: 40px;
+  background: #ffffff;
+  border: 1.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  z-index: 60;
+  pointer-events: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: ew-resize;
+}
+
+.transform-handle-pill:hover {
+  transform: translateY(-50%) scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.transform-handle-pill.w {
+  left: -5px;
+}
+
+.transform-handle-pill.e {
+  right: -5px;
 }

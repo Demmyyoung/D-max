@@ -1,7 +1,6 @@
 import React from 'react';
 import StudioHeader from './StudioHeader';
 import BigCanvas from './BigCanvas';
-import FloatingAddButton from './FloatingAddButton';
 import './Studio.css';
 
 const StudioLayout = () => {
@@ -10,7 +9,6 @@ const StudioLayout = () => {
       <StudioHeader />
       <div className="studio-layout">
         <BigCanvas />
-        <FloatingAddButton />
       </div>
     </div>
   );
