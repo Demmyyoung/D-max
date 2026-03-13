@@ -37,9 +37,6 @@ const ContextToolbar = ({ selectedId, localBlocks, camera, containerSize }) => {
     '#10b981', '#f59e0b', '#0ea5e9', '#64748b'
   ];
 
-  const block = blocks.find(b => b.id === selectedId);
-  const localPos = localBlocks?.[selectedId];
-
   if (!block || !localPos) return null;
 
   const screenX = containerSize.width / 2 - camera.x * camera.zoom;

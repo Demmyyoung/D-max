@@ -32,21 +32,52 @@ const FloatingAddButton = () => {
     }
     
     const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        addBlock('image', event.target.result, {
-          name: file.name,
-          width: 150,
-          height: 150
-        });
-      } catch (err) {
-        console.error('Failed to add image block:', err);
-        alert('Could not add image. Please try a different file.');
-      }
+    reader.onload = (readerEvent) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const MAX_INITIAL = 350;
+          const ratio = img.width / img.height;
+          
+          let blockWidth = 200;
+          let blockHeight = 200;
+
+          if (ratio > 1) { // Landscape
+            blockWidth = Math.min(img.width, MAX_INITIAL);
+            blockHeight = blockWidth / ratio;
+          } else { // Portrait or Square
+            blockHeight = Math.min(img.height, MAX_INITIAL);
+            blockWidth = blockHeight * ratio;
+          }
+
+          // Scale image to fit the container
+          const initialScale = blockWidth / img.width;
+
+          addBlock('image', readerEvent.target.result, {
+            name: file.name,
+            width: blockWidth,
+            height: blockHeight,
+            imageScale: initialScale,
+            imageOffsetX: 0,
+            imageOffsetY: 0
+          });
+        } catch (err) {
+          console.error('[D-MAX] Error during image block creation:', err);
+          alert('Failed to process image. It might be too large.');
+        }
+      };
+      
+      img.onerror = () => {
+        alert('Invalid image file. Please try another.');
+      };
+      
+      img.src = readerEvent.target.result;
     };
+    
     reader.onerror = () => {
       alert('Could not read file. Please try again.');
     };
+    
     reader.readAsDataURL(file);
     e.target.value = '';
     setIsOpen(false);

@@ -64,7 +64,6 @@ export const useDesignStore = create(
           }
         }),
 
-      // Add a new block (pattern, logo, text, image)
       addBlock: (type, url, options = {}) =>
         set((state) => {
           const newBlock = {
@@ -79,7 +78,7 @@ export const useDesignStore = create(
             rotation: options.rotation ?? 0,
             opacity: options.opacity ?? 1,
             // Text-specific
-            text: options.text ?? "Untitled Text",
+            text: options.text ?? "YOUR TEXT",
             fontSize: options.fontSize ?? 18,
             fontFamily: options.fontFamily ?? "Inter",
             fill: options.fill ?? "#000000",
@@ -88,6 +87,7 @@ export const useDesignStore = create(
             locked: false,
             visible: true,
             createdAt: Date.now(),
+            ...options // Overwrite/add any extra options (like imageScale, flipX, etc.)
           };
           state.blocks.push(newBlock);
           state.selectedIds = [newBlock.id];
