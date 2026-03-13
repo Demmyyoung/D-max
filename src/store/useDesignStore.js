@@ -46,10 +46,23 @@ export const useDesignStore = create(
       blocks: [],
       selectedIds: [], // Now an array to support multi-select
       canvasColor: "#ffffff",
+      recentColors: ["#000000", "#ffffff", "#6366f1", "#f43f5e", "#10b981"],
       canvasWidth: 400,
       canvasHeight: 500,
 
       // ===== ACTIONS =====
+      addRecentColor: (color) =>
+        set((state) => {
+          if (!color) return;
+          // Remove if already exists to move it to the front
+          state.recentColors = state.recentColors.filter((c) => c !== color);
+          // Add to the front
+          state.recentColors.unshift(color);
+          // Keep only top 12
+          if (state.recentColors.length > 12) {
+            state.recentColors.pop();
+          }
+        }),
 
       // Add a new block (pattern, logo, text, image)
       addBlock: (type, url, options = {}) =>
@@ -66,8 +79,8 @@ export const useDesignStore = create(
             rotation: options.rotation ?? 0,
             opacity: options.opacity ?? 1,
             // Text-specific
-            text: options.text ?? "",
-            fontSize: options.fontSize ?? 24,
+            text: options.text ?? "Untitled Text",
+            fontSize: options.fontSize ?? 18,
             fontFamily: options.fontFamily ?? "Inter",
             fill: options.fill ?? "#000000",
             // Metadata

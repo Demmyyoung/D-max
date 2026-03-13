@@ -365,7 +365,7 @@ const TransformWrapper = ({
                 height: naturalSize.height ? `${naturalSize.height}px` : 'auto',
                 maxWidth: 'none',
                 maxHeight: 'none',
-                transform: `translate(calc(-50% + ${imageOffset.x}px), calc(-50% + ${imageOffset.y}px)) scale(${imageScale})`,
+                transform: `translate(calc(-50% + ${imageOffset.x}px), calc(-50% + ${imageOffset.y}px)) scale(${imageScale}) ${block.flipX ? 'scaleX(-1)' : ''}`,
                 objectFit: 'none',
                 pointerEvents: isCropMode ? 'auto' : 'none',
                 userSelect: 'none',
@@ -405,9 +405,9 @@ const TransformWrapper = ({
           opacity: block.opacity || 1,
           willChange: 'transform',
           zIndex: isDragging ? 200 : 50,
-          outline: '1px solid #ffffff',
-          outlineOffset: '1px',
-          boxShadow: '0 0 0 1px rgba(0, 0, 0, 0.15)',
+          outline: '2px solid #6366f1',
+          outlineOffset: '2px',
+          boxShadow: '0 0 0 1px rgba(255, 255, 255, 0.8)',
         }}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -440,7 +440,7 @@ const TransformWrapper = ({
                 height: naturalSize.height ? `${naturalSize.height}px` : 'auto',
                 maxWidth: 'none',
                 maxHeight: 'none',
-                transform: `translate(calc(-50% + ${imageOffset.x}px), calc(-50% + ${imageOffset.y}px)) scale(${imageScale})`,
+                transform: `translate(calc(-50% + ${imageOffset.x}px), calc(-50% + ${imageOffset.y}px)) scale(${imageScale}) ${block.flipX ? 'scaleX(-1)' : ''}`,
                 objectFit: 'none',
                 pointerEvents: isCropMode ? 'auto' : 'none',
                 userSelect: 'none',

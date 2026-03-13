@@ -16,7 +16,8 @@ const BigCanvas = () => {
   
   // Design Store Integration
   const storeBlocks = useDesignStore((state) => state.blocks);
-  const selectedId = useDesignStore((state) => state.selectedId);
+  const selectedIds = useDesignStore((state) => state.selectedIds) || [];
+  const selectedId = selectedIds[0] || null;
   const selectBlock = useDesignStore((state) => state.selectBlock);
   const deselectAll = useDesignStore((state) => state.deselectAll);
   const updateBlock = useDesignStore((state) => state.updateBlock);
@@ -166,6 +167,18 @@ const BigCanvas = () => {
     setLocalBlocks(newLocalBlocks);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeBlocks]); // Intentionally omitting localBlocks and interaction states to avoid infinite loops
+
+  // Auto-edit new text blocks
+  const prevBlocksCount = useRef(storeBlocks.length);
+  useEffect(() => {
+    if (storeBlocks.length > prevBlocksCount.current) {
+      const lastBlock = storeBlocks[storeBlocks.length - 1];
+      if (lastBlock.type === 'text') {
+        setEditingBlockId(lastBlock.id);
+      }
+    }
+    prevBlocksCount.current = storeBlocks.length;
+  }, [storeBlocks.length, storeBlocks]);
 
   // Utility to clamp camera within bounds
   // Camera represents the CENTER of the screen in world coordinates
@@ -645,7 +658,7 @@ const BigCanvas = () => {
              width: block.width || 100, height: block.height || 100,
              scale: block.scale || 1, rotation: block.rotation || 0
           };
-          const isSelected = useDesignStore.getState().selectedIds.includes(block.id);
+          const isSelected = selectedIds.includes(block.id);
           const isBlockDragging = draggingBlock !== null && isSelected;
           const workspaceSize = containerSize.width > 0 ? containerSize.width * 5 : 5000;
           
@@ -796,13 +809,67 @@ const BigCanvas = () => {
       </div>
 
       {/* Contextual Toolbar for selected block */}
-      {selectedId && (
+      {selectedId && !editingBlockId && (
         <ContextToolbar
           selectedId={selectedId}
           localBlocks={localBlocks}
           camera={camera}
           containerSize={containerSize}
         />
+      )}
+
+      {/* Inline Text Editor Overlay */}
+      {editingBlockId && localBlocks[editingBlockId] && (
+        <div
+          style={{
+            position: 'absolute',
+            zIndex: 1000,
+            left: screenX + localBlocks[editingBlockId].x * camera.zoom,
+            top: screenY + localBlocks[editingBlockId].y * camera.zoom,
+            width: localBlocks[editingBlockId].width * camera.zoom,
+            height: localBlocks[editingBlockId].height * camera.zoom,
+            background: '#ffffff',
+            boxShadow: '0 0 0 2000px rgba(0,0,0,0.3)', // Dim everything else
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '2px',
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <textarea
+            autoFocus
+            onFocus={(e) => e.target.select()}
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              outline: '2px solid #6366f1',
+              background: 'transparent',
+              fontSize: (storeBlocks.find(b => b.id === editingBlockId)?.fontSize || 24) * camera.zoom + 'px',
+              fontFamily: storeBlocks.find(b => b.id === editingBlockId)?.fontFamily || 'Inter',
+              color: storeBlocks.find(b => b.id === editingBlockId)?.fill || '#000000',
+              textAlign: 'center',
+              resize: 'none',
+              padding: '0',
+              margin: '0',
+            }}
+            defaultValue={storeBlocks.find(b => b.id === editingBlockId)?.text || ''}
+            onBlur={(e) => {
+              updateBlock(editingBlockId, { text: e.target.value });
+              setEditingBlockId(null);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                e.target.blur();
+              }
+              if (e.key === 'Escape') {
+                setEditingBlockId(null);
+              }
+            }}
+          />
+        </div>
       )}
 
       {/* Context Menu */}
