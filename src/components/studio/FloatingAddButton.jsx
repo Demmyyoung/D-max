@@ -11,7 +11,7 @@ const FloatingAddButton = () => {
 
   const handleAddText = () => {
     addBlock('text', '', { 
-      text: 'YOUR TEXT', 
+      text: 'UNTITLED', 
       fontSize: 28, 
       fontFamily: 'Inter', 
       width: 150, 

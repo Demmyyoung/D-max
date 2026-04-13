@@ -665,6 +665,8 @@ const BigCanvas = () => {
           
           // ── Text blocks → TextTransformWrapper (direct manipulation) ──
           if (block.type === 'text') {
+            // Hide the block while it's being inline-edited (prevents ghost text)
+            if (editingBlockId === block.id) return null;
             return (
               <TextTransformWrapper
                 key={block.id}
@@ -826,58 +828,65 @@ const BigCanvas = () => {
       )}
 
       {/* Inline Text Editor Overlay */}
-      {editingBlockId && localBlocks[editingBlockId] && (
-        <div
-          style={{
-            position: 'absolute',
-            zIndex: 1000,
-            left: screenX + localBlocks[editingBlockId].x * camera.zoom,
-            top: screenY + localBlocks[editingBlockId].y * camera.zoom,
-            width: localBlocks[editingBlockId].width * camera.zoom,
-            height: localBlocks[editingBlockId].height * camera.zoom,
-            background: '#ffffff',
-            boxShadow: '0 0 0 2000px rgba(0,0,0,0.3)', // Dim everything else
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: '2px',
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-        >
-          <textarea
-            autoFocus
-            onFocus={(e) => e.target.select()}
+      {editingBlockId && localBlocks[editingBlockId] && (() => {
+        const block = storeBlocks.find(b => b.id === editingBlockId);
+        return (
+          <div
             style={{
-              width: '100%',
-              height: '100%',
-              border: 'none',
+              position: 'absolute',
+              zIndex: 1000,
+              left: screenX + localBlocks[editingBlockId].x * camera.zoom,
+              top: screenY + localBlocks[editingBlockId].y * camera.zoom,
+              width: localBlocks[editingBlockId].width * camera.zoom,
+              height: localBlocks[editingBlockId].height * camera.zoom,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '2px',
               outline: '2px solid #6366f1',
-              background: 'transparent',
-              fontSize: (storeBlocks.find(b => b.id === editingBlockId)?.fontSize || 24) * camera.zoom + 'px',
-              fontFamily: storeBlocks.find(b => b.id === editingBlockId)?.fontFamily || 'Inter',
-              color: storeBlocks.find(b => b.id === editingBlockId)?.fill || '#000000',
-              textAlign: 'center',
-              resize: 'none',
-              padding: '0',
-              margin: '0',
+              outlineOffset: '2px',
             }}
-            defaultValue={storeBlocks.find(b => b.id === editingBlockId)?.text || ''}
-            onBlur={(e) => {
-              updateBlock(editingBlockId, { text: e.target.value });
-              setEditingBlockId(null);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                e.target.blur();
-              }
-              if (e.key === 'Escape') {
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            <textarea
+              autoFocus
+              onFocus={(e) => e.target.select()}
+              style={{
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                fontSize: (block?.fontSize || 24) * camera.zoom + 'px',
+                fontFamily: block?.fontFamily || 'Inter',
+                color: block?.fill || '#000000',
+                textAlign: 'center',
+                resize: 'none',
+                padding: '4px 8px',
+                margin: '0',
+                caretColor: block?.fill || '#000000',
+                WebkitTextFillColor: block?.fill || '#000000',
+                boxSizing: 'border-box',
+                lineHeight: 1.3,
+              }}
+              defaultValue={block?.text || ''}
+              onBlur={(e) => {
+                updateBlock(editingBlockId, { text: e.target.value });
                 setEditingBlockId(null);
-              }
-            }}
-          />
-        </div>
-      )}
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  e.target.blur();
+                }
+                if (e.key === 'Escape') {
+                  setEditingBlockId(null);
+                }
+              }}
+            />
+          </div>
+        );
+      })()}
 
       {/* Context Menu */}
       {contextMenu.visible && (

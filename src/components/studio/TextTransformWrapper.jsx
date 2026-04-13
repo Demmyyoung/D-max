@@ -414,9 +414,12 @@ const TextTransformWrapper = ({
             overflowWrap:   'break-word',
             whiteSpace:     'pre-wrap',
             textAlign:      'center',
+            background:     'transparent',
+            userSelect:     'none',
+            WebkitUserSelect: 'none',
           }}
         >
-          <span>{block.text || 'Text'}</span>
+          <span>{block.text || 'Untitled'}</span>
         </div>
 
         {/* ── Handles (rendered once on selection change) ── */}
