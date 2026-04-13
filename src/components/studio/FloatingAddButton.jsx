@@ -22,38 +22,61 @@ const FloatingAddButton = () => {
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
+    console.log('[D-MAX Studio] File selected:', file?.name, file?.size, file?.type);
     if (!file) return;
     
-    // Reject files over 5MB to prevent canvas crash
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image too large. Please use an image under 5MB.');
-      e.target.value = '';
-      return;
-    }
+    // We remove the 5MB limit and implement client-side compression instead!
     
     const reader = new FileReader();
     reader.onload = (readerEvent) => {
-      const img = new Image();
+      console.log('[D-MAX Studio] FileReader loaded');
+      const img = new window.Image();
       img.onload = () => {
+        console.log('[D-MAX Studio] Image object loaded:', img.width, 'x', img.height);
         try {
+          // --- COMPRESSION LOGIC ---
+          const MAX_DIMENSION = 1200; // Limit max resolution to keep Base64 size safe for localStorage
+          let targetWidth = img.width;
+          let targetHeight = img.height;
+          
+          if (targetWidth > MAX_DIMENSION || targetHeight > MAX_DIMENSION) {
+            const ratio = targetWidth / targetHeight;
+            if (ratio > 1) {
+              targetWidth = MAX_DIMENSION;
+              targetHeight = MAX_DIMENSION / ratio;
+            } else {
+              targetHeight = MAX_DIMENSION;
+              targetWidth = MAX_DIMENSION * ratio;
+            }
+          }
+          
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          
+          // Use WebP for good compression with transparency support
+          const compressedDataUrl = canvas.toDataURL('image/webp', 0.85);
+          // -------------------------
+
           const MAX_INITIAL = 350;
-          const ratio = img.width / img.height;
+          const ratio = targetWidth / targetHeight;
           
           let blockWidth = 200;
           let blockHeight = 200;
 
           if (ratio > 1) { // Landscape
-            blockWidth = Math.min(img.width, MAX_INITIAL);
+            blockWidth = Math.min(targetWidth, MAX_INITIAL);
             blockHeight = blockWidth / ratio;
           } else { // Portrait or Square
-            blockHeight = Math.min(img.height, MAX_INITIAL);
+            blockHeight = Math.min(targetHeight, MAX_INITIAL);
             blockWidth = blockHeight * ratio;
           }
 
-          // Scale image to fit the container
-          const initialScale = blockWidth / img.width;
+          const initialScale = blockWidth / targetWidth;
 
-          addBlock('image', readerEvent.target.result, {
+          addBlock('image', compressedDataUrl, {
             name: file.name,
             width: blockWidth,
             height: blockHeight,
@@ -63,7 +86,7 @@ const FloatingAddButton = () => {
           });
         } catch (err) {
           console.error('[D-MAX] Error during image block creation:', err);
-          alert('Failed to process image. It might be too large.');
+          alert('Failed to process image. It might be corrupted.');
         }
       };
       
@@ -92,7 +115,26 @@ const FloatingAddButton = () => {
     { 
       label: 'Upload Image', 
       icon: <Image size={18} />, 
-      action: () => fileInputRef.current.click() 
+      action: () => {
+        if (fileInputRef.current) {
+          fileInputRef.current.click();
+        }
+      }
+    },
+    {
+      label: 'Add Flat',
+      icon: <Layout size={18} />,
+      action: () => {
+        addBlock('raglan-flat', '', {
+          name: 'Raglan Flat',
+          width: 300,
+          height: 300,
+          bodyColor: '#FFFFFF',
+          leftSleeveColor: '#7C3AED',
+          rightSleeveColor: '#7C3AED'
+        });
+        setIsOpen(false);
+      }
     },
     { 
       label: 'Browse Graphics', 
@@ -154,40 +196,43 @@ const FloatingAddButton = () => {
               Add Element
             </div>
             
-            {options.map((opt, i) => (
-              <button
-                key={i}
-                onClick={opt.action}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '10px 14px',
-                  borderRadius: '12px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#111111',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  width: '100%',
-                  transition: 'background 0.15s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(0, 0, 0, 0.04)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                }}
-              >
-                <span style={{ color: '#111111' }}>{opt.icon}</span>
-                <span style={{ 
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  letterSpacing: '0.01em',
-                  color: '#111111',
-                }}>{opt.label}</span>
-              </button>
-            ))}
+
+            {options.map((opt, i) => {
+              return (
+                <button
+                  key={i}
+                  onClick={opt.action}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 14px',
+                    borderRadius: '12px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#111111',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    width: '100%',
+                    transition: 'background 0.15s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.04)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  <span style={{ color: '#111111' }}>{opt.icon}</span>
+                  <span style={{ 
+                    fontSize: '0.8rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.01em',
+                    color: '#111111',
+                  }}>{opt.label}</span>
+                </button>
+              );
+            })}
           </motion.div>
         </>
       )}
@@ -202,6 +247,7 @@ const FloatingAddButton = () => {
         style={{ display: 'none' }} 
         accept="image/*"
         onChange={handleImageUpload}
+        id="studio-image-upload-input"
       />
 
       <motion.button

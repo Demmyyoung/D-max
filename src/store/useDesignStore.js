@@ -66,6 +66,7 @@ export const useDesignStore = create(
 
       addBlock: (type, url, options = {}) =>
         set((state) => {
+          console.log('[D-MAX Store] addBlock called:', { type, urlLength: url?.length, options });
           const newBlock = {
             id: `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             type,
@@ -91,6 +92,7 @@ export const useDesignStore = create(
           };
           state.blocks.push(newBlock);
           state.selectedIds = [newBlock.id];
+          console.log('[D-MAX Store] New block added. Total blocks:', state.blocks.length);
         }),
 
       // Update block attributes (optimistic - instant UI response)

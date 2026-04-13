@@ -108,7 +108,7 @@
   position: absolute;
   background: #ffffff;
   border: 1.5px solid rgba(0, 0, 0, 0.15);
-  border-radius: 3px;
+  border-radius: 0;
   box-shadow: 
     0 1px 4px rgba(0, 0, 0, 0.25),
     0 0 0 0.5px rgba(255, 255, 255, 0.8);
@@ -120,6 +120,7 @@
 .transform-handle-pill.w {
   width: 6px;
   height: 40px;
+  max-height: calc(100% - 24px);
   top: 50%;
   left: -4px;
   transform: translateY(-50%);
@@ -129,6 +130,7 @@
 .transform-handle-pill.e {
   width: 6px;
   height: 40px;
+  max-height: calc(100% - 24px);
   top: 50%;
   right: -4px;
   transform: translateY(-50%);
@@ -137,6 +139,7 @@
 
 .transform-handle-pill.n {
   width: 40px;
+  max-width: calc(100% - 24px);
   height: 6px;
   top: -4px;
   left: 50%;
@@ -146,6 +149,7 @@
 
 .transform-handle-pill.s {
   width: 40px;
+  max-width: calc(100% - 24px);
   height: 6px;
   bottom: -4px;
   left: 50%;

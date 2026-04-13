@@ -6,6 +6,7 @@ import TransformWrapper from './TransformWrapper';
 import TextTransformWrapper from './TextTransformWrapper';
 import FloatingAddButton from './FloatingAddButton';
 import ContextToolbar from './ContextToolbar';
+import RaglanFlat from './RaglanFlat';
 import './BigCanvas.css';
 
 const WORKSPACE_SIZE = 5000;
@@ -726,6 +727,12 @@ const BigCanvas = () => {
                     opacity: block.opacity ?? 1,
                     transform: block.flipX ? 'scaleX(-1)' : 'none',
                   }}
+                />
+              ) : block.type === 'raglan-flat' ? (
+                <RaglanFlat 
+                  bodyColor={block.bodyColor}
+                  leftSleeveColor={block.leftSleeveColor}
+                  rightSleeveColor={block.rightSleeveColor}
                 />
               ) : (
                 <div style={{ padding: '0.5rem' }}>
