@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { MousePointer, Hand, Minus, Plus, RotateCcw, Copy, Trash2, Edit3, Trash } from 'lucide-react';
+import { motion, LayoutGroup } from 'framer-motion';
 import { useDesignStore } from '../../store/useDesignStore';
 import { useStudio } from '../../context/StudioContext';
 import TransformWrapper from './TransformWrapper';
@@ -665,8 +666,6 @@ const BigCanvas = () => {
           
           // ── Text blocks → TextTransformWrapper (direct manipulation) ──
           if (block.type === 'text') {
-            // Hide the block while it's being inline-edited (prevents ghost text)
-            if (editingBlockId === block.id) return null;
             return (
               <TextTransformWrapper
                 key={block.id}
@@ -766,55 +765,62 @@ const BigCanvas = () => {
         )}
       </div>
 
-      {/* Bottom Navigation Dock */}
-      <div className="canvas-bottom-dock">
-        {/* Tools */}
-
-        <div className="dock-divider"></div>
-
-        {/* Zoom Controls */}
-        <div className="dock-group">
-          <button 
-            className="dock-btn"
-            onClick={() => setCamera(prev => ({ ...prev, zoom: Math.max(minZoom, prev.zoom - 0.25) }))}
-            title="Zoom Out"
+      {/* Bottom Navigation Dock — LayoutGroup lets the button's size change
+           propagate up to the dock's layout spring across component boundaries */}
+      <div className="canvas-dock-wrapper">
+        <LayoutGroup id="dock">
+          <motion.div
+            className="canvas-bottom-dock"
+            layout
+            transition={{ type: 'spring', stiffness: 160, damping: 14 }}
           >
-            <Minus size={22} />
-          </button>
-          
-          <div 
-            className="dock-text" 
-            title="Reset View"
-            onClick={() => setCamera({ x: WORKSPACE_SIZE / 2, y: WORKSPACE_SIZE / 2, zoom: 1 })}
-            style={{ cursor: 'pointer' }}
-          >
-            {Math.round(camera.zoom * 100)}%
-          </div>
+            {/* Zoom Controls */}
+            <motion.div className="dock-group" layout>
+              <button 
+                className="dock-btn"
+                onClick={() => setCamera(prev => ({ ...prev, zoom: Math.max(minZoom, prev.zoom - 0.25) }))}
+                title="Zoom Out"
+              >
+                <Minus size={20} strokeWidth={2} />
+              </button>
+              
+              <div 
+                className="dock-text" 
+                title="Reset View"
+                onClick={() => setCamera({ x: WORKSPACE_SIZE / 2, y: WORKSPACE_SIZE / 2, zoom: 1 })}
+                style={{ cursor: 'pointer' }}
+              >
+                {Math.round(camera.zoom * 100)}%
+              </div>
 
-          <button 
-            className="dock-btn"
-            onClick={() => setCamera(prev => ({ ...prev, zoom: Math.min(MAX_ZOOM, prev.zoom + 0.25) }))}
-            title="Zoom In"
-          >
-            <Plus size={22} />
-          </button>
-        </div>
+              <button 
+                className="dock-btn"
+                onClick={() => setCamera(prev => ({ ...prev, zoom: Math.min(MAX_ZOOM, prev.zoom + 0.25) }))}
+                title="Zoom In"
+              >
+                <Plus size={20} strokeWidth={2} />
+              </button>
+            </motion.div>
 
-        <div className="dock-divider"></div>
+            <div className="dock-divider"></div>
 
-        {/* Add Button Centerpiece */}
-        <FloatingAddButton />
+            {/* Add Button Centerpiece */}
+            <FloatingAddButton />
 
-        <div className="dock-divider"></div>
+            <div className="dock-divider"></div>
 
-        {/* Recenter */}
-        <button 
-          className="dock-btn"
-          onClick={() => setCamera({ x: WORKSPACE_SIZE / 2, y: WORKSPACE_SIZE / 2, zoom: 1 })}
-          title="Recenter Canvas"
-        >
-          <RotateCcw size={22} />
-        </button>
+            {/* Recenter */}
+            <motion.div className="dock-group" layout>
+              <button 
+                className="dock-btn"
+                onClick={() => setCamera({ x: WORKSPACE_SIZE / 2, y: WORKSPACE_SIZE / 2, zoom: 1 })}
+                title="Recenter Canvas"
+              >
+                <RotateCcw size={20} strokeWidth={2.4} />
+              </button>
+            </motion.div>
+          </motion.div>
+        </LayoutGroup>
       </div>
 
       {/* Contextual Toolbar for selected block */}
@@ -827,66 +833,7 @@ const BigCanvas = () => {
         />
       )}
 
-      {/* Inline Text Editor Overlay */}
-      {editingBlockId && localBlocks[editingBlockId] && (() => {
-        const block = storeBlocks.find(b => b.id === editingBlockId);
-        return (
-          <div
-            style={{
-              position: 'absolute',
-              zIndex: 1000,
-              left: screenX + localBlocks[editingBlockId].x * camera.zoom,
-              top: screenY + localBlocks[editingBlockId].y * camera.zoom,
-              width: localBlocks[editingBlockId].width * camera.zoom,
-              height: localBlocks[editingBlockId].height * camera.zoom,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '2px',
-              outline: '2px solid #6366f1',
-              outlineOffset: '2px',
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-          >
-            <textarea
-              autoFocus
-              onFocus={(e) => e.target.select()}
-              style={{
-                width: '100%',
-                height: '100%',
-                border: 'none',
-                outline: 'none',
-                background: 'transparent',
-                fontSize: (block?.fontSize || 24) * camera.zoom + 'px',
-                fontFamily: block?.fontFamily || 'Inter',
-                color: block?.fill || '#000000',
-                textAlign: 'center',
-                resize: 'none',
-                padding: '4px 8px',
-                margin: '0',
-                caretColor: block?.fill || '#000000',
-                WebkitTextFillColor: block?.fill || '#000000',
-                boxSizing: 'border-box',
-                lineHeight: 1.3,
-              }}
-              defaultValue={block?.text || ''}
-              onBlur={(e) => {
-                updateBlock(editingBlockId, { text: e.target.value });
-                setEditingBlockId(null);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  e.target.blur();
-                }
-                if (e.key === 'Escape') {
-                  setEditingBlockId(null);
-                }
-              }}
-            />
-          </div>
-        );
-      })()}
+
 
       {/* Context Menu */}
       {contextMenu.visible && (

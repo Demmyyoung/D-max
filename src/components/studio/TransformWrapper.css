@@ -39,11 +39,13 @@
     0 0 0 0.5px rgba(255, 255, 255, 0.8);
   z-index: 60;
   pointer-events: auto;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.15s ease;
 }
 
 .transform-handle:hover {
-  transform: scale(1.2) !important;
+  transform: scale(1.35) !important;
   box-shadow: 
     0 2px 8px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.9);
@@ -59,10 +61,10 @@
 .transform-handle.w  { top: 50%; left: -5.5px; transform: translateY(-50%); cursor: ew-resize; }
 
 /* For the centered handles, hover must preserve their translation */
-.transform-handle.n:hover { transform: translateX(-50%) scale(1.2) !important; }
-.transform-handle.s:hover { transform: translateX(-50%) scale(1.2) !important; }
-.transform-handle.e:hover { transform: translateY(-50%) scale(1.2) !important; }
-.transform-handle.w:hover { transform: translateY(-50%) scale(1.2) !important; }
+.transform-handle.n:hover { transform: translateX(-50%) scale(1.35) !important; }
+.transform-handle.s:hover { transform: translateX(-50%) scale(1.35) !important; }
+.transform-handle.e:hover { transform: translateY(-50%) scale(1.35) !important; }
+.transform-handle.w:hover { transform: translateY(-50%) scale(1.35) !important; }
 
 /* Responsive Feed Tooltip */
 .transform-tooltip {
@@ -114,7 +116,9 @@
     0 0 0 0.5px rgba(255, 255, 255, 0.8);
   z-index: 60;
   pointer-events: auto;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.15s ease;
 }
 
 .transform-handle-pill.w {
@@ -157,7 +161,7 @@
   cursor: ns-resize;
 }
 
-.transform-handle-pill.w:hover { transform: translateY(-50%) scale(1.2) !important; }
-.transform-handle-pill.e:hover { transform: translateY(-50%) scale(1.2) !important; }
-.transform-handle-pill.n:hover { transform: translateX(-50%) scale(1.2) !important; }
-.transform-handle-pill.s:hover { transform: translateX(-50%) scale(1.2) !important; }
+.transform-handle-pill.w:hover { transform: translateY(-50%) scale(1.3) !important; }
+.transform-handle-pill.e:hover { transform: translateY(-50%) scale(1.3) !important; }
+.transform-handle-pill.n:hover { transform: translateX(-50%) scale(1.3) !important; }
+.transform-handle-pill.s:hover { transform: translateX(-50%) scale(1.3) !important; }

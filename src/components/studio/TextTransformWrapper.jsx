@@ -27,6 +27,7 @@ const TextTransformWrapper = ({
   WORKSPACE_SIZE = 5000,
   isDragging = false,
   setEditingBlockId,
+  editingBlockId,
 }) => {
   // ... (rest of the component) ...
 
@@ -56,6 +57,8 @@ const TextTransformWrapper = ({
   useEffect(() => {
     setShowHandles(isSelected && activeTool === 'select');
   }, [isSelected, activeTool]);
+
+
 
   // ─── Min-width helper (DOM measurement, cached per drag session) ──────────
   const getMinWidth = useCallback(() => {
@@ -399,27 +402,103 @@ const TextTransformWrapper = ({
         <div
           ref={textContentRef}
           style={{
-            width:          '100%',
-            height:         '100%',
-            display:        'flex',
-            alignItems:     'center',
-            justifyContent: 'center',
-            fontFamily:     block.fontFamily || 'inherit',
-            fontSize:       `${currentFontSize}px`,
-            color:          block.fill || block.color || '#000000',
-            lineHeight:     1.3,
-            padding:        '4px 8px',
-            boxSizing:      'border-box',
-            wordWrap:       'break-word',
-            overflowWrap:   'break-word',
-            whiteSpace:     'pre-wrap',
-            textAlign:      'center',
-            background:     'transparent',
-            userSelect:     'none',
+            width:            '100%',
+            height:           '100%',
+            display:          'flex',
+            alignItems:       'center',
+            justifyContent:   'center',
+            fontFamily:       block.fontFamily || 'inherit',
+            fontSize:         `${currentFontSize}px`,
+            color:            block.fill || block.color || '#000000',
+            lineHeight:       1.3,
+            padding:          '4px 8px',
+            boxSizing:        'border-box',
+            wordWrap:         'break-word',
+            overflowWrap:     'break-word',
+            whiteSpace:       'pre-wrap',
+            textAlign:        'center',
+            background:       'transparent',
+            userSelect:       'none',
             WebkitUserSelect: 'none',
           }}
         >
-          <span>{block.text || 'Untitled'}</span>
+          {editingBlockId === block.id ? (
+            <textarea
+              autoFocus
+              onFocus={(e) => e.target.select()}
+              defaultValue={block.text || ''}
+              onPointerDown={(e) => e.stopPropagation()}
+              ref={(el) => {
+                if (!el) return;
+                // On first mount: snap to true content height immediately
+                el.style.height = 'auto';
+                const initH = Math.max(el.scrollHeight, currentFontSize * 1.3 + 8);
+                el.style.height = `${initH}px`;
+                if (Math.round(initH) !== Math.round(localPos.height)) {
+                  setLocalBlocks(prev => ({
+                    ...prev,
+                    [block.id]: { ...prev[block.id], height: initH },
+                  }));
+                  useDesignStore.getState().updateBlock(block.id, { height: initH });
+                }
+              }}
+              onChange={(e) => {
+                const ta = e.target;
+                // Reset to auto so scrollHeight shrinks properly when deleting
+                ta.style.height = 'auto';
+                const newHeight = ta.scrollHeight;
+                ta.style.height = `${newHeight}px`;
+
+                // Push new height + text into local state and store
+                setLocalBlocks(prev => ({
+                  ...prev,
+                  [block.id]: { ...prev[block.id], height: newHeight },
+                }));
+                useDesignStore.getState().updateBlock(block.id, {
+                  text: ta.value,
+                  height: newHeight,
+                });
+              }}
+              onBlur={(e) => {
+                useDesignStore.getState().updateBlock(block.id, { text: e.target.value });
+                setEditingBlockId(null);
+              }}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  e.target.blur();
+                }
+                if (e.key === 'Escape') {
+                  setEditingBlockId(null);
+                }
+              }}
+              style={{
+                width:          '100%',
+                height:         '100%',
+                minHeight:      '1em',
+                border:         'none',
+                outline:        'none',
+                background:     'transparent',
+                fontFamily:     block.fontFamily || 'inherit',
+                fontSize:       `${currentFontSize}px`,
+                color:          block.fill || block.color || '#000000',
+                lineHeight:     1.3,
+                textAlign:      'center',
+                resize:         'none',
+                padding:        '0',
+                margin:         '0',
+                boxSizing:      'border-box',
+                whiteSpace:     'pre-wrap',
+                wordWrap:       'break-word',
+                caretColor:     block.fill || block.color || '#000000',
+                cursor:         'text',
+                overflow:       'hidden',
+              }}
+            />
+          ) : (
+            <span>{block.text || 'Untitled'}</span>
+          )}
         </div>
 
         {/* ── Handles (rendered once on selection change) ── */}

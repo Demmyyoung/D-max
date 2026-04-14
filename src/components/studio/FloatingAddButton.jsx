@@ -11,9 +11,9 @@ const FloatingAddButton = () => {
 
   const handleAddText = () => {
     addBlock('text', '', { 
-      text: 'UNTITLED', 
+      text: 'W$', 
       fontSize: 28, 
-      fontFamily: 'Inter', 
+      fontFamily: '"Playfair Display", Georgia, serif', 
       width: 150, 
       height: 40 
     });
@@ -164,9 +164,10 @@ const FloatingAddButton = () => {
           />
           
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95, x: '-50%' }}
+            initial={{ opacity: 0, y: 40, scale: 0.85, x: '-50%' }}
             animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
-            exit={{ opacity: 0, y: 20, scale: 0.95, x: '-50%' }}
+            exit={{ opacity: 0, y: 40, scale: 0.85, x: '-50%' }}
+            transition={{ type: 'spring', stiffness: 420, damping: 26 }}
             style={{
               position: 'fixed',
               bottom: '100px',
@@ -180,7 +181,7 @@ const FloatingAddButton = () => {
               flexDirection: 'column',
               gap: '2px',
               minWidth: '200px',
-              boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+              boxShadow: '0 24px 64px rgba(0, 0, 0, 0.2), 0 12px 24px rgba(0, 0, 0, 0.1)',
             }}
           >
             <div style={{
@@ -197,42 +198,46 @@ const FloatingAddButton = () => {
             </div>
             
 
-            {options.map((opt, i) => {
-              return (
-                <button
-                  key={i}
-                  onClick={opt.action}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '10px 14px',
-                    borderRadius: '12px',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#111111',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    width: '100%',
-                    transition: 'background 0.15s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(0, 0, 0, 0.04)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                  }}
-                >
-                  <span style={{ color: '#111111' }}>{opt.icon}</span>
-                  <span style={{ 
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.01em',
-                    color: '#111111',
-                  }}>{opt.label}</span>
-                </button>
-              );
-            })}
+            {options.map((opt, i) => (
+              <motion.button
+                key={i}
+                onClick={opt.action}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 22, delay: i * 0.045 }}
+                whileHover={{
+                  scale: 1.04,
+                  x: 3,
+                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                  transition: { type: 'spring', stiffness: 500, damping: 20 }
+                }}
+                whileTap={{
+                  scale: 0.96,
+                  transition: { type: 'spring', stiffness: 600, damping: 20 }
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '10px 14px',
+                  borderRadius: '12px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#111111',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  width: '100%',
+                }}
+              >
+                <span style={{ color: '#111111' }}>{opt.icon}</span>
+                <span style={{ 
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.01em',
+                  color: '#111111',
+                }}>{opt.label}</span>
+              </motion.button>
+            ))}
           </motion.div>
         </>
       )}
@@ -251,13 +256,40 @@ const FloatingAddButton = () => {
       />
 
       <motion.button
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        layout
         onClick={() => setIsOpen(!isOpen)}
         className="dock-add-btn"
+        animate={isOpen
+          ? { scale: 1.06, backgroundColor: '#333333' }
+          : { scale: 1,    backgroundColor: '#000000' }
+        }
+        whileHover={!isOpen
+          ? { scale: 1.07, transition: { type: 'spring', stiffness: 500, damping: 22 } }
+          : {}
+        }
+        whileTap={{ scale: 0.94, transition: { type: 'spring', stiffness: 600, damping: 20 } }}
+        transition={{ type: 'spring', stiffness: 160, damping: 14 }}
+        style={{ overflow: 'hidden' }}
       >
-        <Plus size={16} strokeWidth={3} />
-        <span>Add</span>
+        <motion.span
+          animate={{ rotate: isOpen ? 45 : 0 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 26 }}
+          style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}
+        >
+          <Plus size={16} strokeWidth={3} />
+        </motion.span>
+        <AnimatePresence mode="popLayout" initial={false}>
+          <motion.span
+            key={isOpen ? 'close' : 'add'}
+            initial={{ opacity: 0, y: 6, width: isOpen ? 'auto' : 'auto' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15 }}
+            style={{ display: 'inline-block', whiteSpace: 'nowrap' }}
+          >
+            {isOpen ? 'Close' : 'Add'}
+          </motion.span>
+        </AnimatePresence>
       </motion.button>
 
       {ReactDOM.createPortal(tray, document.body)}

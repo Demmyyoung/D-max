@@ -1,47 +1,71 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Download, Share2, Command } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Download, Share2, Pencil } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useDesignStore } from '../../store/useDesignStore';
 
 const StudioHeader = () => {
   const { addToCart } = useCart();
   const { blocks, canvasColor } = useDesignStore();
+  const [designName, setDesignName] = useState('Untitled Design');
+  const [isEditing, setIsEditing] = useState(false);
+  const [draft, setDraft] = useState(designName);
+  const inputRef = useRef(null);
+  
+  // Auto-focus and select all when entering edit mode
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [isEditing]);
+
+  const startEditing = () => {
+    setDraft(designName);
+    setIsEditing(true);
+  };
+
+  const commitEdit = () => {
+    const trimmed = draft.trim();
+    setDesignName(trimmed || 'Untitled Design');
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') commitEdit();
+    if (e.key === 'Escape') setIsEditing(false);
+  };
   
   const handleDownload = () => {
-    // For now, show a message - in production this would use a server-side rendering service
     console.log('Export coming in Phase 5');
   };
 
-  const handleAddToBag = () => {
+  const handleOrderSample = () => {
     if (blocks.length === 0) {
       alert('Your design is empty! Add some graphics or text first.');
       return;
     }
 
-    // Capture current design as a virtual product
     const customProduct = {
       id: `custom-${Date.now()}`,
-      name: 'Custom D-MAX Piece',
-      price: 0, // Placeholder price until defined
-      image: '/garments/hoodie-front.png', // Fallback to current garment view
+      name: designName,
+      price: 0,
+      image: '/garments/hoodie-front.png',
       isCustom: true,
-      designData: {
-        blocks,
-        canvasColor
-      }
+      designData: { blocks, canvasColor }
     };
 
     addToCart(customProduct);
-    alert('Design added to your bag!');
+    alert('Design added to your order!');
   };
   
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'D-MAX Design',
-          text: 'Check out my custom D-MAX design!',
+          title: designName,
+          text: `Check out my custom D-MAX design: ${designName}`,
           url: window.location.href
         });
       } catch (error) {
@@ -61,42 +85,63 @@ const StudioHeader = () => {
           <ArrowLeft size={18} />
           <span>Exit</span>
         </Link>
-        <div className="project-info">
-          <span className="project-name">Untitled Design</span>
+      </div>
+      
+      <div className="studio-header-center">
+        <div className="project-info" style={{ borderLeft: 'none', paddingLeft: 0, alignItems: 'center' }}>
+          {isEditing ? (
+            <input
+              ref={inputRef}
+              className="project-name-input"
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onBlur={commitEdit}
+              onKeyDown={handleKeyDown}
+              maxLength={40}
+            />
+          ) : (
+            <button
+              className="project-name-btn"
+              onClick={startEditing}
+              title="Click to rename"
+            >
+              <span className="project-name" style={{ fontSize: '0.95rem' }}>{designName}</span>
+              <Pencil size={11} className="project-name-edit-icon" />
+            </button>
+          )}
           <span className="project-status">● Auto-saved</span>
         </div>
       </div>
       
-      <div className="studio-header-center">
-        <span className="studio-title">
-          <img
-            src="/logo.png"
-            alt="D-MAX"
-            style={{
-              height: '22px',
-              width: 'auto',
-              objectFit: 'contain',
-              filter: 'brightness(0) invert(1)', /* white logo on dark header */
-              verticalAlign: 'middle',
-              marginRight: '6px',
-            }}
-          />
-          STUDIO
-        </span>
-      </div>
-      
       <div className="studio-header-right">
-        <button className="header-btn secondary" onClick={handleDownload} title="Download Design">
+        <motion.button
+          className="header-btn secondary"
+          onClick={handleDownload}
+          title="Download Design"
+          whileHover={{ scale: 1.06, transition: { type: 'spring', stiffness: 500, damping: 22 } }}
+          whileTap={{ scale: 0.93, transition: { type: 'spring', stiffness: 600, damping: 20 } }}
+        >
           <Download size={16} />
           <span>Export</span>
-        </button>
-        <button className="header-btn secondary" onClick={handleShare} title="Share">
+        </motion.button>
+        <motion.button
+          className="header-btn secondary"
+          onClick={handleShare}
+          title="Share"
+          whileHover={{ scale: 1.06, transition: { type: 'spring', stiffness: 500, damping: 22 } }}
+          whileTap={{ scale: 0.93, transition: { type: 'spring', stiffness: 600, damping: 20 } }}
+        >
           <Share2 size={16} />
-        </button>
-        <button className="header-btn primary" onClick={handleAddToBag}>
+        </motion.button>
+        <motion.button
+          className="header-btn brand-forward"
+          onClick={handleOrderSample}
+          whileHover={{ scale: 1.08, y: -1, transition: { type: 'spring', stiffness: 500, damping: 22 } }}
+          whileTap={{ scale: 0.94, transition: { type: 'spring', stiffness: 600, damping: 20 } }}
+        >
           <ShoppingCart size={16} />
-          <span>Add to Bag</span>
-        </button>
+          <span>Order Sample</span>
+        </motion.button>
       </div>
     </header>
   );
