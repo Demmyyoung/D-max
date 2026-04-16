@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { MousePointer, Hand, Minus, Plus, RotateCcw, Copy, Trash2, Edit3, Trash } from 'lucide-react';
+import { MousePointer, Hand, Minus, Plus, RotateCcw, Copy, Trash2, Edit3, Trash, Moon, Sun } from 'lucide-react';
 import { motion, LayoutGroup } from 'framer-motion';
 import { useDesignStore } from '../../store/useDesignStore';
 import { useStudio } from '../../context/StudioContext';
@@ -24,6 +24,7 @@ const BigCanvas = () => {
   const deselectAll = useDesignStore((state) => state.deselectAll);
   const updateBlock = useDesignStore((state) => state.updateBlock);
   const canvasColor = useDesignStore((state) => state.canvasColor);
+  const setCanvasColor = useDesignStore((state) => state.setCanvasColor);
   
   // Backwards compatibility with activeGarment
   const { activeGarment } = useStudio();
@@ -630,7 +631,8 @@ const BigCanvas = () => {
         className="big-canvas-workspace"
         style={{
           transform: `translate(${screenX}px, ${screenY}px) scale(${camera.zoom})`,
-          backgroundColor: canvasColor // Apply background color from store
+          backgroundColor: canvasColor,
+          '--grid-dot-color': canvasColor === '#1e1e1e' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'
         }}
       >
         {/* Render Garment Silhouette */}
@@ -767,7 +769,7 @@ const BigCanvas = () => {
 
       {/* Bottom Navigation Dock — LayoutGroup lets the button's size change
            propagate up to the dock's layout spring across component boundaries */}
-      <div className="canvas-dock-wrapper">
+      <div className={`canvas-dock-wrapper ${canvasColor === '#1e1e1e' ? 'dark-mode' : ''}`}>
         <LayoutGroup id="dock">
           <motion.div
             className="canvas-bottom-dock"

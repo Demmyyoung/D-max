@@ -35,10 +35,11 @@
   height: 5000px;
   background-color: #ffffff;
   /* Dotted grid background */
-  background-image: radial-gradient(rgba(0, 0, 0, 0.08) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-image: radial-gradient(var(--grid-dot-color, rgba(0, 0, 0, 0.06)) 1px, transparent 1px);
+  background-size: 16px 16px;
   transform-origin: 0 0;
   box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
+  z-index: 0;
   /* Use will-change to optimize transformations */
   will-change: transform;
 }
@@ -71,37 +72,55 @@
   cursor: grabbing !important;
 }
 
-/* Bottom Nav Dock */
 .canvas-dock-wrapper {
-  position: absolute;
-  bottom: 80px;
-  left: 0;
-  right: 0;
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   justify-content: center;
   align-items: center;
   pointer-events: none;
   z-index: 100;
   margin-bottom: env(safe-area-inset-bottom, 0px);
+  --dock-bg: #ffffff;
+  --dock-border: rgba(0, 0, 0, 0.08);
+  --dock-text: #111111;
+  --dock-hover-bg: rgba(0, 0, 0, 0.06);
+  --dock-hover-text: #000000;
+  --dock-divider: rgba(0, 0, 0, 0.1);
+  --dock-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.canvas-dock-wrapper.dark-mode {
+  --dock-bg: #222222;
+  --dock-border: rgba(255, 255, 255, 0.12);
+  --dock-text: #e5e5e5;
+  --dock-hover-bg: rgba(255, 255, 255, 0.08);
+  --dock-hover-text: #ffffff;
+  --dock-divider: rgba(255, 255, 255, 0.15);
+  --dock-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .canvas-bottom-dock {
   pointer-events: all;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--dock-bg);
+  border: 1px solid var(--dock-border);
   border-radius: 100px;
   padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--dock-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .dock-divider {
   width: 1px;
   height: 20px;
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: var(--dock-divider);
   margin: 0 4px;
+  transition: background-color 0.3s ease;
 }
 
 .dock-group {
@@ -119,16 +138,17 @@
   border-radius: 50%;
   border: none;
   background-color: transparent;
-  color: #111111;
+  color: var(--dock-text);
   cursor: pointer;
   transition:
     background-color 0.15s ease,
+    color 0.15s ease,
     transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .dock-btn:hover {
-  background-color: rgba(0, 0, 0, 0.06);
-  color: #000000;
+  background-color: var(--dock-hover-bg);
+  color: var(--dock-hover-text);
   transform: scale(1.18);
 }
 
@@ -146,7 +166,7 @@
   font-family: inherit;
   font-size: 13px;
   font-weight: 600;
-  color: #111111;
+  color: var(--dock-text);
   min-width: 44px;
   text-align: center;
   user-select: none;

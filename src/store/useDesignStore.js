@@ -45,7 +45,7 @@ export const useDesignStore = create(
       // ===== STATE =====
       blocks: [],
       selectedIds: [], // Now an array to support multi-select
-      canvasColor: "#ffffff",
+      canvasColor: "#1e1e1e",
       recentColors: ["#000000", "#ffffff", "#6366f1", "#f43f5e", "#10b981"],
       canvasWidth: 400,
       canvasHeight: 500,

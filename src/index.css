@@ -7,6 +7,8 @@
   --text-primary: #111111;
   --text-secondary: #555555;
   --accent: #000000;
+  --bg-charcoal: #121212;
+  --luxury-teal: #0b3d30;
 
   --spacing-container: 4vw;
   --header-height: 80px;
@@ -52,6 +54,10 @@ button {
   padding: 0 var(--spacing-container);
   max-width: 1600px;
   margin: 0 auto;
+}
+
+.btn-pill {
+  border-radius: 9999px !important;
 }
 
 /* Scrollbar Hide */

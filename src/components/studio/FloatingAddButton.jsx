@@ -169,19 +169,19 @@ const FloatingAddButton = () => {
             exit={{ opacity: 0, y: 40, scale: 0.85, x: '-50%' }}
             transition={{ type: 'spring', stiffness: 420, damping: 26 }}
             style={{
-              position: 'fixed',
-              bottom: '100px',
+              position: 'absolute',
+              bottom: 'calc(100% + 12px)',
               left: '50%',
               zIndex: 9999,
-              background: '#ffffff',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
+              background: 'var(--dock-bg, #ffffff)',
+              border: '1px solid var(--dock-border, rgba(0, 0, 0, 0.08))',
               borderRadius: '20px',
               padding: '8px',
               display: 'flex',
               flexDirection: 'column',
               gap: '2px',
               minWidth: '200px',
-              boxShadow: '0 24px 64px rgba(0, 0, 0, 0.2), 0 12px 24px rgba(0, 0, 0, 0.1)',
+              boxShadow: 'var(--dock-shadow, 0 10px 30px rgba(0, 0, 0, 0.15))',
             }}
           >
             <div style={{
@@ -189,9 +189,10 @@ const FloatingAddButton = () => {
               fontWeight: 700,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: 'rgba(0, 0, 0, 0.35)',
+              color: 'var(--dock-text, #111111)',
+              opacity: 0.5,
               padding: '8px 12px 6px',
-              borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
+              borderBottom: '1px solid var(--dock-border, rgba(0, 0, 0, 0.06))',
               marginBottom: '4px',
             }}>
               Add Element
@@ -208,7 +209,7 @@ const FloatingAddButton = () => {
                 whileHover={{
                   scale: 1.04,
                   x: 3,
-                  backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                  backgroundColor: 'var(--dock-hover-bg, rgba(0, 0, 0, 0.05))',
                   transition: { type: 'spring', stiffness: 500, damping: 20 }
                 }}
                 whileTap={{
@@ -223,18 +224,18 @@ const FloatingAddButton = () => {
                   borderRadius: '12px',
                   background: 'transparent',
                   border: 'none',
-                  color: '#111111',
+                  color: 'var(--dock-text, #111111)',
                   cursor: 'pointer',
                   textAlign: 'left',
                   width: '100%',
                 }}
               >
-                <span style={{ color: '#111111' }}>{opt.icon}</span>
+                <span style={{ color: 'var(--dock-text, #111111)' }}>{opt.icon}</span>
                 <span style={{ 
                   fontSize: '0.8rem',
                   fontWeight: 600,
                   letterSpacing: '0.01em',
-                  color: '#111111',
+                  color: 'var(--dock-text, #111111)',
                 }}>{opt.label}</span>
               </motion.button>
             ))}
@@ -245,7 +246,7 @@ const FloatingAddButton = () => {
   );
 
   return (
-    <>
+    <div style={{ position: 'relative', display: 'flex' }}>
       <input 
         type="file" 
         ref={fileInputRef} 
@@ -258,18 +259,19 @@ const FloatingAddButton = () => {
       <motion.button
         layout
         onClick={() => setIsOpen(!isOpen)}
-        className="dock-add-btn"
-        animate={isOpen
-          ? { scale: 1.06, backgroundColor: '#333333' }
-          : { scale: 1,    backgroundColor: '#000000' }
-        }
+        className="dock-add-btn btn-pill"
+        animate={{
+          scale: isOpen ? 1.06 : 1,
+          backgroundColor: isOpen ? '#333333' : '#000000',
+          opacity: 1
+        }}
         whileHover={!isOpen
           ? { scale: 1.07, transition: { type: 'spring', stiffness: 500, damping: 22 } }
           : {}
         }
         whileTap={{ scale: 0.94, transition: { type: 'spring', stiffness: 600, damping: 20 } }}
         transition={{ type: 'spring', stiffness: 160, damping: 14 }}
-        style={{ overflow: 'hidden' }}
+        style={{ overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}
       >
         <motion.span
           animate={{ rotate: isOpen ? 45 : 0 }}
@@ -292,8 +294,8 @@ const FloatingAddButton = () => {
         </AnimatePresence>
       </motion.button>
 
-      {ReactDOM.createPortal(tray, document.body)}
-    </>
+      {tray}
+    </div>
   );
 };
 
