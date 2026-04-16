@@ -125,7 +125,7 @@ const StudioHeader = () => {
         <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
           <motion.div 
             className="back-link" 
-            whileHover={{ color: '#ef4444' }} 
+            whileHover={{ color: '#ef4444', transition: { duration: 0 } }} 
             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
           >
             <ArrowLeft size={18} />

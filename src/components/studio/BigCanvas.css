@@ -204,3 +204,19 @@
   transform: scale(0.94) translateY(0px);
   transition: transform 0.1s ease;
 }
+
+/* Dark Mode Context Menu Overrides */
+.context-menu.dark-context {
+  background-color: #222222 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+.context-menu.dark-context .context-menu-item {
+  color: #ffffff !important;
+}
+.context-menu.dark-context .context-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+}
+.context-menu.dark-context .context-menu-divider {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}

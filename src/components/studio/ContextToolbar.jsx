@@ -59,7 +59,7 @@ const ContextToolbar = ({ selectedId, localBlocks, camera, containerSize }) => {
   return (
     <div
       ref={toolbarRef}
-      className="context-toolbar"
+      className={`context-toolbar ${useDesignStore.getState().canvasColor === '#1e1e1e' ? 'dark-mode' : ''}`}
       style={{ left: toolbarLeft, top: toolbarTop }}
       onPointerDown={(e) => e.stopPropagation()}
     >

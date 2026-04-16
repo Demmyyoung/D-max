@@ -134,3 +134,25 @@
   transform: translateX(-50%);
   z-index: 1001;
 }
+
+/* Dark Mode Overrides */
+.context-toolbar.dark-mode {
+  background: #222222 !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+}
+.context-toolbar.dark-mode .ctx-btn {
+  color: #ffffff !important;
+}
+.context-toolbar.dark-mode .ctx-btn:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+.context-toolbar.dark-mode .ctx-divider {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+.context-toolbar.dark-mode .ctx-label {
+  color: #ffffff !important;
+}
+.context-toolbar.dark-mode .ctx-color-pill,
+.context-toolbar.dark-mode .ctx-color-wrap {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}

@@ -840,18 +840,12 @@ const BigCanvas = () => {
       {/* Context Menu */}
       {contextMenu.visible && (
         <div
-          className="context-menu"
+          className={`context-menu ${canvasColor === '#1e1e1e' ? 'dark-context' : ''}`}
           style={{
             position: 'fixed',
             left: contextMenu.x,
             top: contextMenu.y,
             zIndex: 9999,
-            background: '#fff',
-            border: '1px solid #e2e8f0',
-            borderRadius: '8px',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-            padding: '6px',
-            minWidth: '160px'
           }}
           onPointerDown={(e) => e.stopPropagation()}
         >

@@ -9,6 +9,8 @@ const FloatingToolbar = ({ selectedId }) => {
   const duplicateBlock = useDesignStore((state) => state.duplicateBlock);
   const moveBlockUp = useDesignStore((state) => state.moveBlockUp);
   const moveBlockDown = useDesignStore((state) => state.moveBlockDown);
+  const canvasColor = useDesignStore((state) => state.canvasColor);
+  const isDark = canvasColor === '#1e1e1e';
   
   const selectedBlock = blocks.find(b => b.id === selectedId);
 
@@ -27,11 +29,11 @@ const FloatingToolbar = ({ selectedId }) => {
             zIndex: 1000,
             display: 'flex',
             gap: '4px',
-            background: 'rgba(30, 30, 30, 0.95)',
+            background: isDark ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
             backdropFilter: 'blur(10px)',
             padding: '6px',
             borderRadius: '8px',
-            border: '1px solid rgba(255,255,255,0.15)',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)'}`,
             boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
             pointerEvents: 'auto'
           }}
@@ -40,7 +42,7 @@ const FloatingToolbar = ({ selectedId }) => {
             onClick={() => duplicateBlock(selectedId)}
             className="toolbar-btn"
             title="Duplicate"
-            style={{ padding: '6px', color: 'white', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px', display: 'flex' }}
+            style={{ padding: '6px', color: isDark ? 'white' : '#111', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px', display: 'flex' }}
           >
             <Copy size={16} />
           </button>
@@ -48,7 +50,7 @@ const FloatingToolbar = ({ selectedId }) => {
             onClick={() => moveBlockUp(selectedId)}
             className="toolbar-btn"
             title="Bring Forward"
-            style={{ padding: '6px', color: 'white', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px', display: 'flex' }}
+            style={{ padding: '6px', color: isDark ? 'white' : '#111', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px', display: 'flex' }}
           >
             <MoveUp size={16} />
           </button>
@@ -56,11 +58,11 @@ const FloatingToolbar = ({ selectedId }) => {
             onClick={() => moveBlockDown(selectedId)}
             className="toolbar-btn"
             title="Send Backward"
-            style={{ padding: '6px', color: 'white', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px', display: 'flex' }}
+            style={{ padding: '6px', color: isDark ? 'white' : '#111', background: 'transparent', border: 'none', cursor: 'pointer', borderRadius: '4px', display: 'flex' }}
           >
             <MoveDown size={16} />
           </button>
-          <div style={{ width: '1px', background: 'rgba(255,255,255,0.1)', margin: '0 4px' }} />
+          <div style={{ width: '1px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', margin: '0 4px' }} />
           <button 
             onClick={() => deleteBlock(selectedId)}
             className="toolbar-btn danger"
