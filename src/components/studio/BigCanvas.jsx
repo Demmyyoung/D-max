@@ -625,7 +625,7 @@ const BigCanvas = () => {
       onContextMenu={handleContextMenu}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      style={{ cursor: isPanning ? 'grabbing' : draggingBlock ? 'default' : 'grab' }}
+      style={{ cursor: isPanning ? 'grabbing' : activeTool === 'pan' ? 'grab' : draggingBlock ? 'grabbing' : 'default' }}
     >
       <div 
         className="big-canvas-workspace"
@@ -776,6 +776,28 @@ const BigCanvas = () => {
             layout
             transition={{ type: 'spring', stiffness: 160, damping: 14 }}
           >
+            {/* Tool Mode Controls */}
+            <motion.div className="dock-group" layout>
+              <button 
+                className={`dock-btn ${activeTool === 'select' ? 'active' : ''}`}
+                onClick={() => setActiveTool('select')}
+                title="Select Tool (V)"
+                style={activeTool === 'select' ? { backgroundColor: 'var(--luxury-teal, #0f766e)', color: '#ffffff' } : {}}
+              >
+                <MousePointer size={18} strokeWidth={2.4} />
+              </button>
+              <button 
+                className={`dock-btn ${activeTool === 'pan' ? 'active' : ''}`}
+                onClick={() => setActiveTool('pan')}
+                title="Pan Tool (H)"
+                style={activeTool === 'pan' ? { backgroundColor: 'var(--luxury-teal, #0f766e)', color: '#ffffff' } : {}}
+              >
+                <Hand size={18} strokeWidth={2.4} />
+              </button>
+            </motion.div>
+
+            <div className="dock-divider"></div>
+
             {/* Zoom Controls */}
             <motion.div className="dock-group" layout>
               <button 

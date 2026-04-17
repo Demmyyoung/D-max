@@ -30,8 +30,8 @@ const Header = () => {
   const travelDistance = (dimensions.height / 2) - 35; // Target 35px from top
   const range = [0, travelDistance];
   
-  // Scale: 1 (Hero) -> 0.12 (Header)
-  const logoScale = useTransform(scrollY, range, [1, 0.12]);
+  // Scale: 1 (Hero) -> 0.18 (Header)
+  const logoScale = useTransform(scrollY, range, [1, 0.18]);
   
   // Y Position: Moves UP exactly as much as we scroll down.
   const logoY = useTransform(scrollY, range, ['0px', `-${travelDistance}px`]);
@@ -62,8 +62,15 @@ const Header = () => {
 
         <motion.nav className="nav-right" style={{ opacity: navOpacity }}>
           <Link to="/create" className="create-btn">Create</Link>
-          <button onClick={toggleCart} className="nav-link"><ShoppingBag size={20} /> ({cartItems.length})</button>
-          <a href="#" className="nav-link"><User size={20} /></a>
+          <button 
+            onClick={toggleCart} 
+            className="nav-link" 
+            style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+          >
+            <ShoppingBag size={18} /> 
+            <span style={{ fontSize: '0.85rem' }}>({cartItems.length})</span>
+          </button>
+          <a href="#" className="nav-link hide-mobile"><User size={18} /></a>
         </motion.nav>
       </motion.header>
 
